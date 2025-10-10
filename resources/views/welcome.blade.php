@@ -13,7 +13,7 @@
 
   
     <!-- Tombol Login -->
-    <a href="{{ route('login') }}" 
+    <a href="{{ route('login') }}" .kk
        class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold px-6 py-2 rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200">
         Login
     </a>

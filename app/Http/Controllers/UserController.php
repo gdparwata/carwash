@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +29,7 @@ class UserController extends Controller
             $query->whereDate('created_at', $request->tanggal);
         }
 
+        // PENTING: Gunakan paginate() agar links() bisa digunakan
         $users = $query->latest()->paginate(10);
 
         // Statistik - hanya user dengan role 'user'
@@ -41,39 +41,30 @@ class UserController extends Controller
     }
 
     /**
-     * Form create user
-     */
-    public function create()
-    {
-        return view('admin.users.create');
-    }
-
-    /**
      * Simpan user baru
      */
     public function store(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'name'            => 'required|string|max:255',
+            'nama_belakang'   => 'nullable|string|max:255',
+            'email'           => 'required|string|email|unique:users,email',
+            'no_telepon'      => 'nullable|string|max:20',
+            'alamat'          => 'nullable|string',
+            'password'        => 'required|string|min:6|confirmed',
         ]);
 
         User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
+            'name'            => $request->name,
+            'nama_belakang'   => $request->nama_belakang,
+            'email'           => $request->email,
+            'no_telepon'      => $request->no_telepon,
+            'alamat'          => $request->alamat,
+            'password'        => Hash::make($request->password),
+            'role'            => 'user', // Set default role
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat!');
-    }
-
-    /**
-     * Form edit user
-     */
-    public function edit(User $user)
-    {
-        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -82,14 +73,20 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|unique:users,email,'.$user->id,
-            'password' => 'nullable|string|min:6|confirmed',
+            'name'            => 'required|string|max:255',
+            'nama_belakang'   => 'nullable|string|max:255',
+            'email'           => 'required|string|email|unique:users,email,' . $user->id_User . ',id_User',
+            'no_telepon'      => 'nullable|string|max:20',
+            'alamat'          => 'nullable|string',
+            'password'        => 'nullable|string|min:6|confirmed',
         ]);
 
         $data = [
-            'name'  => $request->name,
-            'email' => $request->email,
+            'name'            => $request->name,
+            'nama_belakang'   => $request->nama_belakang,
+            'email'           => $request->email,
+            'no_telepon'      => $request->no_telepon,
+            'alamat'          => $request->alamat,
         ];
 
         if ($request->filled('password')) {
@@ -102,11 +99,64 @@ class UserController extends Controller
     }
 
     /**
-     * Hapus user
+     * Hapus user (Soft Delete)
      */
-  public function destroy(User $user)
-{
-    $user->delete(); // Gunakan parameter $user yang sudah di-inject
-    return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus!');
-}
+    public function destroy(User $user)
+    {
+        // Pastikan tidak menghapus diri sendiri
+        if ($user->id_User === auth()->id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Anda tidak dapat menghapus akun sendiri!');
+        }
+
+        // Soft delete
+        $user->delete();
+        
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User berhasil dihapus!');
+    }
+
+    /**
+     * Tampilkan user yang dihapus (Trashed)
+     */
+    public function trashed()
+    {
+        $users = User::where('role', 'user')
+            ->onlyTrashed()
+            ->latest()
+            ->paginate(10);
+        
+        $totalTrashed = User::where('role', 'user')->onlyTrashed()->count();
+        
+        return view('admin.users.trashed', compact('users', 'totalTrashed'));
+    }
+
+    /**
+     * Restore user yang dihapus
+     */
+    public function restore(User $user)
+    {
+        $user->restore();
+        
+        return redirect()->route('admin.users.trashed')
+            ->with('success', 'User berhasil dipulihkan!');
+    }
+
+    /**
+     * Hapus permanen user
+     */
+    public function forceDelete(User $user)
+    {
+        // Pastikan user sudah di-soft delete
+        if (!$user->trashed()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'User harus dihapus terlebih dahulu sebelum dihapus permanen!');
+        }
+
+        $user->forceDelete();
+        
+        return redirect()->route('admin.users.trashed')
+            ->with('success', 'User berhasil dihapus permanen!');
+    }
+
 }

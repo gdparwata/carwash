@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Font Awesome untuk Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,229 +33,182 @@
         .nav-link.active::after {
             width: 100%;
         }
+
+        /* Hamburger animation */
+        .hamburger-line {
+            transition: all 0.3s ease;
+        }
+        .hamburger-active .line1 {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger-active .line2 {
+            opacity: 0;
+        }
+        .hamburger-active .line3 {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
     
-    <!-- Navbar -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                
+    <header class="bg-white shadow-sm" x-data="{ mobileMenuOpen: false }">
+        <div class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex items-center justify-between">
                 <!-- Logo -->
-                <div class="flex-shrink-0">
-                    <a href="{{ route('welcome') }}" class="flex items-center">
-                        <span class="text-2xl font-bold">
-                            <span class="text-gray-800">cuci</span><span class="text-cyan-600">car</span>
-                        </span>
-                    </a>
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-teal-600">cucicar</span>
                 </div>
                 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex md:items-center md:space-x-8">
-                    <a href="{{ route('welcome') }}" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200 {{ request()->is('/') ? 'active text-cyan-600' : '' }}">
-                        Cuci Mobil
-                    </a>
-                    <a href="#" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200">
-                        Paket Banjir
-                    </a>
-                    <a href="#" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200">
-                        Salon Mobil
-                    </a>
-                    <a href="#" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200">
-                        Paket Harga
-                    </a>
-                    <a href="#" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200">
-                        History
-                    </a>
-                    <a href="{{ route('blogs.index') }}" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200 {{ request()->is('blog*') ? 'active text-cyan-600' : '' }}">
-                        Blog
-                    </a>
-                    <a href="#" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200">
-                        About us
-                    </a>
-                    
-                    @auth
-                    <a href="{{ route('profile.show') }}" 
-                       class="nav-link text-gray-700 hover:text-cyan-600 font-medium transition duration-200 {{ request()->is('profile*') ? 'active text-cyan-600' : '' }}">
-                        Profile
-                    </a>
-                    @endauth
-                </div>
+                <nav class="hidden lg:flex space-x-6 xl:space-x-8">
+                    <a href="{{ route('cucimobil') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">Cuci Mobil</a>
+                    <a href="{{ route('paketbanjir') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">Paket Banjir</a>
+                    <a href="{{ route('salonmobil') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">Salon Mobil</a>
+                    <a href="{{ route('paket.public') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">Paket Harga</a>
+                    <a href="{{ route('blogs.index') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">Blog</a>
+                    <a href="{{ route('aboutus') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">About us</a>
+                    <a href="{{ route('profile.show') }}" class="nav-link text-gray-600 hover:text-teal-600 transition-colors">Profile</a>
+                </nav>
                 
-                <!-- Right Side (Button & Mobile Menu) -->
-                <div class="flex items-center space-x-4">
-                    @auth
-                    <!-- Pesan Sekarang Button -->
+                <!-- Right Side -->
+                <div class="flex items-center space-x-3">
+                    <!-- Desktop CTA Button -->
                     <a href="{{ route('bookings.create') }}" 
-                       class="hidden md:block bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-300">
+                       class="hidden sm:inline-block bg-blue-600 text-white font-semibold px-4 sm:px-6 py-2 rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-sm">
                         Pesan Sekarang
                     </a>
-                    
-                    <!-- User Avatar -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
-                            @if(Auth::user()->foto_profile)
-                            <img src="{{ asset('storage/' . Auth::user()->foto_profile) }}" 
-                                 class="w-10 h-10 rounded-full border-2 border-cyan-500 object-cover hover:scale-110 transition duration-200" 
-                                 alt="avatar">
-                            @else
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0891b2&color=fff" 
-                                 class="w-10 h-10 rounded-full border-2 border-cyan-500 hover:scale-110 transition duration-200" 
-                                 alt="avatar">
-                            @endif
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div x-show="open" 
-                             @click.away="open = false"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50">
-                            <div class="px-4 py-2 border-b border-gray-200">
-                                <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
-                                <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
-                            </div>
-                            <a href="{{ route('dashboard') }}" 
-                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 transition duration-200">
-                                <i class="fas fa-th-large mr-2"></i> Dashboard
-                            </a>
-                            <a href="{{ route('profile.show') }}" 
-                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 transition duration-200">
-                                <i class="fas fa-user mr-2"></i> Profile
-                            </a>
-                            <a href="{{ route('bookings.create') }}" 
-                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 transition duration-200">
-                                <i class="fas fa-calendar-plus mr-2"></i> Booking
-                            </a>
-                            <hr class="my-2">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    @else
-                    <!-- Login/Register Buttons -->
-                    <a href="{{ route('login') }}" 
-                       class="hidden md:block text-gray-700 hover:text-cyan-600 font-semibold transition duration-200">
-                        Login
-                    </a>
-                    <a href="{{ route('register') }}" 
-                       class="hidden md:block bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-300">
-                        Register
-                    </a>
-                    @endauth
-                    
-                    <!-- Mobile Menu Button -->
+
+                    <!-- Hamburger Button -->
                     <button @click="mobileMenuOpen = !mobileMenuOpen" 
-                            class="md:hidden text-gray-700 hover:text-cyan-600 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
+                            class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                            :class="{ 'hamburger-active': mobileMenuOpen }">
+                        <div class="w-6 h-5 flex flex-col justify-between">
+                            <span class="hamburger-line line1 w-full h-0.5 bg-gray-600 rounded"></span>
+                            <span class="hamburger-line line2 w-full h-0.5 bg-gray-600 rounded"></span>
+                            <span class="hamburger-line line3 w-full h-0.5 bg-gray-600 rounded"></span>
+                        </div>
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <!-- Mobile Menu -->
         <div x-show="mobileMenuOpen" 
-             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform -translate-y-4"
              x-transition:enter-end="opacity-100 transform translate-y-0"
-             class="md:hidden bg-white border-t border-gray-200">
-            <div class="px-4 pt-2 pb-4 space-y-2">
-                <a href="{{ route('welcome') }}" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-4"
+             @click.away="mobileMenuOpen = false"
+             class="lg:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="{{ route('cucimobil') }}" 
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     Cuci Mobil
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+                <a href="{{ route('paketbanjir') }}" 
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     Paket Banjir
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+                <a href="{{ route('salonmobil') }}" 
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     Salon Mobil
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+                <a href="{{ route('paket.public') }}" 
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     Paket Harga
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
-                    History
-                </a>
                 <a href="{{ route('blogs.index') }}" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     Blog
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+                <a href="{{ route('aboutus') }}" 
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     About us
                 </a>
                 
                 @auth
                 <a href="{{ route('profile.show') }}" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200">
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200">
                     Profile
                 </a>
                 <a href="{{ route('bookings.create') }}" 
-                   class="block px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-center font-semibold">
+                   class="block px-4 py-3 bg-blue-600 text-white rounded-lg text-center font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 mt-2">
                     Pesan Sekarang
                 </a>
                 @else
                 <a href="{{ route('login') }}" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-cyan-50 rounded-lg transition duration-200 text-center">
+                   class="block px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition duration-200 text-center">
                     Login
                 </a>
                 <a href="{{ route('register') }}" 
-                   class="block px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg text-center font-semibold">
+                   class="block px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg text-center font-semibold shadow-md mt-2">
                     Register
                 </a>
                 @endauth
             </div>
         </div>
-    </nav>
+    </header>
     
     <!-- Main Content -->
     <main>
         @yield('content')
     </main>
     
-    <!-- Footer (Optional) -->
-    <footer class="bg-gray-800 text-white py-8 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p class="text-xl font-bold mb-2">
-                    <span class="text-white">cuci</span><span class="text-cyan-400">car</span>
-                </p>
-                <p class="text-gray-400 text-sm">© 2024 CuciCar. All rights reserved.</p>
+    <!-- Footer -->
+    <footer class="bg-gray-100 py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div>
+                    <h3 class="text-2xl font-bold text-teal-600 mb-4">cucicar</h3>
+                    <p class="text-sm text-gray-600 mb-2">Jl. Akasia Gang rama 4 blok a.</p>
+                    <p class="text-sm text-gray-600 mb-4">Denpasar timur, Denpasar, Bali, Indonesia.</p>
+                    
+                    <h4 class="font-bold text-gray-800 mb-2">Wilayah Operasional</h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Denpasar</li>
+                        <li>• Badung</li>
+                        <li>• Karangasem</li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-4">Layanan</h4>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li><a href="{{ route('cucimobil') }}" class="hover:text-teal-600">Cuci mobil</a></li>
+                        <li><a href="{{ route('paketbanjir') }}" class="hover:text-teal-600">Paket banjir</a></li>
+                        <li><a href="{{ route('salonmobil') }}" class="hover:text-teal-600">Salon mobil</a></li>
+                    </ul>
+                </div>
+
+                <!-- Information -->
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-4">Informasi</h4>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li><a href="{{ route('aboutus') }}" class="hover:text-teal-600">About Us</a></li>
+                        <li><a href="{{ route('blogs.index') }}" class="hover:text-teal-600">Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Rating -->
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-4">Google rating</h4>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl font-bold text-gray-800">4.8</span>
+                        <div class="flex text-yellow-400">
+                            <span>⭐⭐⭐⭐⭐</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
     
     <!-- Alpine.js untuk Dropdown & Mobile Menu -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <script>
-        // Initialize Alpine data
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('navbar', () => ({
-                mobileMenuOpen: false
-            }))
-        })
-    </script>
 
 </body>
 </html>

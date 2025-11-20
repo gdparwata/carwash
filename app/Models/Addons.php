@@ -22,7 +22,7 @@ class Addons extends Model
     
     public function bookings()
     {
-        return $this->hasMany(Booking::class, 'id_Addons', 'id_addons');
+        // PERBAIKAN: gunakan id_addons, bukan id_Addons
+        return $this->hasMany(Booking::class, 'id_addons', 'id_addons');
     }
-    
 }

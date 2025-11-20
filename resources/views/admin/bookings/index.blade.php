@@ -12,45 +12,112 @@
         from { opacity: 0; }
         to { opacity: 1; }
     }
+    
+    /* Pagination Custom Styles */
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .pagination a,
+    .pagination span {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    /* Previous & Next buttons */
+    .pagination .page-link {
+        background-color: #14b8a6; /* teal-500 */
+        color: #6b7280; /* gray-500 */
+        border: none;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #0d9488; /* teal-600 */
+        color: #4b5563; /* gray-600 */
+    }
+    
+    /* Active page */
+    .pagination .active span {
+        background-color: white !important;
+        color: #14b8a6 !important; /* teal-500 */
+        font-weight: 600;
+        border: 2px solid #14b8a6;
+    }
+    
+    /* Disabled state */
+    .pagination .disabled span {
+        background-color: #d1d5db; /* gray-300 */
+        color: #9ca3af; /* gray-400 */
+        cursor: not-allowed;
+    }
+    
+    /* Number pages */
+    .pagination .page-item:not(.active):not(.disabled) a {
+        background-color: #f3f4f6; /* gray-100 */
+        color: #6b7280; /* gray-500 */
+    }
+    
+    .pagination .page-item:not(.active):not(.disabled) a:hover {
+        background-color: #e5e7eb; /* gray-200 */
+        color: #374151; /* gray-700 */
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 640px) {
+        .pagination a,
+        .pagination span {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
-    <div class="ml-44 p-8">
+    <div class="p-4 md:p-8">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6 flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-gray-700">Data Booking</h2>
-            <div class="flex gap-2">
-                <button onclick="viewUnassignedBookings()" class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
-                    <span id="unassigned-badge" class="hidden bg-red-500 text-white rounded-full px-2 py-1 text-xs mr-2"></span>
-                    Booking Menunggu Pegawai
-                </button>
-                <button onclick="openCreateModal()" class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600">
-                    Create New data
-                </button>
+        <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-4 md:mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-700">Data Booking</h2>
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                    <button onclick="viewUnassignedBookings()" class="bg-blue-700 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-blue-800 transition text-sm md:text-base w-full sm:w-auto">
+                        <span id="unassigned-badge" class="hidden bg-red-500 text-white rounded-full px-2 py-1 text-xs mr-2"></span>
+                        Booking Menunggu Pegawai
+                    </button>
+                    <button onclick="openCreateModal()" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 transition text-sm md:text-base w-full sm:w-auto">
+                        Create New Data
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Filter Section -->
-        <div class="bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg shadow p-6 mb-6">
-            <form method="GET" action="{{ route('admin.bookings.index') }}" class="flex gap-4">
+        <div class="bg-gradient-to-r from-teal-400 to-teal-500 rounded-lg shadow p-4 md:p-6 mb-4 md:mb-6">
+            <form method="GET" action="{{ route('admin.bookings.index') }}" class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
                     <label class="block text-white text-sm mb-2">Tanggal</label>
-                    <input type="date" name="tanggal" value="{{ request('tanggal') }}" 
-                           class="w-full px-4 py-2 rounded-lg border-0">
+                    <input type="date" 
+                           name="tanggal" 
+                           value="{{ request('tanggal') }}"
+                           class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
+                           style="color-scheme: light;">
                 </div>
                 <div class="flex-1">
-                    <label class="block text-white text-sm mb-2">Kategori booking</label>
-                    <select name="kategori" class="w-full px-4 py-2 rounded-lg border-0">
-                        <option value="">Sudah Selesai</option>
+                    <label class="block text-white text-sm mb-2">Kategori Booking</label>
+                    <select name="kategori" class="w-full px-4 py-2 rounded-lg border-0 bg-white text-sm md:text-base">
+                        <option value="">Semua Status</option>
                         <option value="InProgres" {{ request('kategori') == 'InProgres' ? 'selected' : '' }}>In Progress</option>
                         <option value="Done" {{ request('kategori') == 'Done' ? 'selected' : '' }}>Done</option>
                         <option value="Canceled" {{ request('kategori') == 'Canceled' ? 'selected' : '' }}>Canceled</option>
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <button type="submit" class="bg-teal-700 text-white px-8 py-2 rounded-lg hover:bg-teal-800">
+                    <button type="submit" class="bg-teal-700 text-white px-6 md:px-8 py-2 rounded-lg hover:bg-teal-800 transition w-full md:w-auto text-sm md:text-base">
                         Filter
                     </button>
                 </div>
@@ -58,131 +125,128 @@
         </div>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-3 gap-6 mb-6">
-            <div class="bg-gradient-to-br from-teal-300 to-teal-400 rounded-lg shadow p-6 text-white">
-                <h3 class="text-sm mb-2">Total Booking</h3>
-                <p class="text-4xl font-bold">{{ $totalBooking }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+            <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow p-5 md:p-6 text-white transform hover:scale-105 transition duration-300">
+                <h3 class="text-xs md:text-sm mb-2 opacity-90">Total Booking</h3>
+                <p class="text-3xl md:text-4xl font-bold">{{ $totalBooking }}</p>
             </div>
-            <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg shadow p-6 text-white">
-                <h3 class="text-sm mb-2">Booking Belum Selesai</h3>
-                <p class="text-4xl font-bold">{{ $bookingBelumSelesai }}</p>
+            <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow p-5 md:p-6 text-white transform hover:scale-105 transition duration-300">
+                <h3 class="text-xs md:text-sm mb-2 opacity-90">Booking Belum Selesai</h3>
+                <p class="text-3xl md:text-4xl font-bold">{{ $bookingBelumSelesai }}</p>
             </div>
-            <div class="bg-gradient-to-br from-teal-300 to-teal-400 rounded-lg shadow p-6 text-white">
-                <h3 class="text-sm mb-2">Booking Selesai</h3>
-                <p class="text-4xl font-bold">{{ $bookingSelesai }}</p>
+            <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow p-5 md:p-6 text-white transform hover:scale-105 transition duration-300 sm:col-span-2 lg:col-span-1">
+                <h3 class="text-xs md:text-sm mb-2 opacity-90">Booking Selesai</h3>
+                <p class="text-3xl md:text-4xl font-bold">{{ $bookingSelesai }}</p>
             </div>
         </div>
 
         <!-- Booking List -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-700">Booking Tanggal {{ request('tanggal') ?? date('d-m-Y') }}</h3>
-                <button onclick="location.reload()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                <h3 class="text-lg md:text-xl font-bold text-gray-700">Booking Tanggal {{ request('tanggal') ?? date('d-m-Y') }}</h3>
+                <button onclick="location.reload()" class="bg-gray-500 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base w-full sm:w-auto">
                     🔄 Refresh
                 </button>
             </div>
 
-@foreach($bookings as $booking)
-<div class="bg-gradient-to-r from-teal-100 to-teal-200 rounded-lg p-6 mb-4">
-    <div class="flex justify-between items-start">
-        <div>
-            <h4 class="text-xl font-bold text-gray-700">
-                {{ $booking->jenisKendaraan->nama_kendaraan ?? 'Mobil' }} 
-                ({{ $booking->jenisKendaraan->jenis_kendaraan ?? 'Kendaraan' }})
-            </h4>
-            <p class="text-sm text-gray-600">{{ $booking->email }}</p>
-            
-            {{-- Badge Penugasan Pegawai - FIXED: gunakan accessor --}}
-            @if($booking->needs_pegawai_assignment)
-                <span class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded mt-1 inline-block">
-                    ⚠️ Menunggu Penugasan Pegawai
-                </span>
-            @endif
-            
-            {{-- Badge Tipe Booking - FIXED: gunakan accessor --}}
-            @if($booking->is_user_booking)
-                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mt-1 inline-block">
-                    💳 User Booking - Belum Bayar
-                </span>
-            @else
-                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded mt-1 inline-block">
-                    ✓ Admin Booking - Sudah Bayar
-                </span>
-            @endif
-            
-            <p class="text-2xl font-bold text-gray-800 mt-2">
-                RP. {{ number_format($booking->harga ?? 0, 0, ',', '.') }}
-            </p>
-        </div>
-        <div class="flex gap-2">
-            {{-- Tombol View --}}
-            <button onclick="openViewModal({{ $booking->id_Booking }})" 
-                    class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
-                view
-            </button>
-            
-            {{-- Tombol Pilih Pegawai - FIXED: gunakan accessor --}}
-            @if($booking->needs_pegawai_assignment)
-                <button onclick="openAssignPegawaiModal({{ $booking->id_Booking }}, '{{ $booking->tanggal }}')" 
-                        class="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition">
-                    Pilih Pegawai
-                </button>
-            @endif
-            
-            {{-- Kondisi berdasarkan status --}}
-            @if($booking->status === 'Done')
-                {{-- Jika Done: Tombol View Invoice + Badge Done --}}
-                <button onclick="viewInvoiceFromList({{ $booking->id_Booking }})" 
-                        class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition">
-                    View Invoice
-                </button>
-                <span class="bg-purple-500 text-white px-6 py-2 rounded-lg flex items-center">
-                    Done
-                </span>
-            @elseif($booking->status === 'Canceled')
-                {{-- Jika Canceled: Tombol Message + Badge Canceled --}}
-                <button onclick="openMessageModal({{ $booking->id_Booking }}, '{{ $booking->email }}', '{{ $booking->nomor_telepon }}')" 
-                        class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition">
-                    Message
-                </button>
-                <span class="bg-red-500 text-white px-6 py-2 rounded-lg flex items-center">
-                    Canceled
-                </span>
-            @else
-                {{-- Jika InProgres: Tombol Message + Dropdown Status --}}
-                <button onclick="openMessageModal({{ $booking->id_Booking }}, '{{ $booking->email }}', '{{ $booking->nomor_telepon }}')" 
-                        class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition">
-                    Message
-                </button>
-                <div class="relative inline-block">
-                    <button onclick="event.stopPropagation(); toggleStatusDropdown({{ $booking->id_Booking }})" 
-                            class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 flex items-center gap-2 transition">
-                        {{ $booking->status }}
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="status-dropdown-{{ $booking->id_Booking }}" 
-                         class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 border border-gray-200">
-                        @php
-                            // FIXED: gunakan accessor
-                            $isUserBooking = $booking->is_user_booking ? 'true' : 'false';
-                        @endphp
-                        <button onclick="event.stopPropagation(); updateStatus({{ $booking->id_Booking }}, 'Done', {{ $isUserBooking }})" 
-                                class="block w-full text-left px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-t-lg transition">
-                            ✓ Done
+            @foreach($bookings as $booking)
+            <div class="bg-gradient-to-r from-teal-100 to-teal-200 rounded-lg p-4 md:p-6 mb-4">
+                <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
+                    <!-- Info Section -->
+                    <div class="w-full lg:w-auto">
+                        <h4 class="text-lg md:text-xl font-bold text-gray-700 break-words">
+                            {{ $booking->jenisKendaraan->nama_kendaraan ?? 'Mobil' }} 
+                            ({{ $booking->jenisKendaraan->jenis_kendaraan ?? 'Kendaraan' }})
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-600 break-all">{{ $booking->email }}</p>
+                        
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            @if($booking->needs_pegawai_assignment)
+                                <span class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded inline-block">
+                                    ⚠️ Menunggu Penugasan Pegawai
+                                </span>
+                            @endif
+                            
+                            @if($booking->is_user_booking)
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded inline-block">
+                                    💳 User Booking - Belum Bayar
+                                </span>
+                            @else
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded inline-block">
+                                    ✓ Admin Booking - Sudah Bayar
+                                </span>
+                            @endif
+                        </div>
+                        
+                        <p class="text-xl md:text-2xl font-bold text-gray-800 mt-2">
+                            RP. {{ number_format($booking->harga ?? 0, 0, ',', '.') }}
+                        </p>
+                    </div>
+                    
+                    <!-- Actions Section -->
+                    <div class="flex flex-col sm:flex-row lg:flex-row gap-2 w-full lg:w-auto">
+                        <button onclick="openViewModal({{ $booking->id_Booking }})" 
+                                class="bg-blue-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-blue-600 transition text-sm md:text-base whitespace-nowrap">
+                            View
                         </button>
-                        <button onclick="event.stopPropagation(); updateStatus({{ $booking->id_Booking }}, 'Canceled', false)" 
-                                class="block w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-b-lg transition">
-                            ✗ Canceled
-                        </button>
+                        
+                        @if($booking->needs_pegawai_assignment)
+                            <button onclick="openAssignPegawaiModal({{ $booking->id_Booking }}, '{{ $booking->tanggal }}')" 
+                                    class="bg-blue-700 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-blue-800 transition text-sm md:text-base whitespace-nowrap">
+                                Pilih Pegawai
+                            </button>
+                        @endif
+                        
+                        @if($booking->status === 'Done')
+                            <button onclick="viewInvoiceFromList({{ $booking->id_Booking }})" 
+                                    class="bg-teal-600 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-700 transition text-sm md:text-base whitespace-nowrap">
+                                View Invoice
+                            </button>
+                            <span class="bg-blue-700 text-white px-4 md:px-6 py-2 rounded-lg flex items-center justify-center text-sm md:text-base">
+                                Done
+                            </span>
+                        @elseif($booking->status === 'Canceled')
+                            <button onclick="openMessageModal({{ $booking->id_Booking }}, '{{ $booking->email }}', '{{ $booking->nomor_telepon }}')" 
+                                    class="bg-teal-600 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-700 transition text-sm md:text-base whitespace-nowrap">
+                                Message
+                            </button>
+                            <span class="bg-red-500 text-white px-4 md:px-6 py-2 rounded-lg flex items-center justify-center text-sm md:text-base">
+                                Canceled
+                            </span>
+                        @else
+                            <button onclick="openMessageModal({{ $booking->id_Booking }}, '{{ $booking->email }}', '{{ $booking->nomor_telepon }}')" 
+                                    class="bg-teal-600 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-700 transition text-sm md:text-base whitespace-nowrap">
+                                Message
+                            </button>
+                            <div class="relative inline-block w-full sm:w-auto">
+                                <button onclick="event.stopPropagation(); toggleStatusDropdown({{ $booking->id_Booking }})" 
+                                        class="bg-red-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-red-600 flex items-center justify-center gap-2 transition text-sm md:text-base w-full">
+                                    {{ $booking->status }}
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div id="status-dropdown-{{ $booking->id_Booking }}" 
+                                     class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 border border-gray-200">
+                                    @php
+                                        $isUserBooking = $booking->is_user_booking ? 'true' : 'false';
+                                    @endphp
+                                    <button onclick="event.stopPropagation(); updateStatus({{ $booking->id_Booking }}, 'Done', {{ $isUserBooking }})" 
+                                            class="block w-full text-left px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-t-lg transition text-sm">
+                                        ✓ Done
+                                    </button>
+                                    <button onclick="event.stopPropagation(); updateStatus({{ $booking->id_Booking }}, 'Canceled', false)" 
+                                            class="block w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-b-lg transition text-sm">
+                                        ✗ Canceled
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
-            @endif
-        </div>
-    </div>
-</div>
-@endforeach
+            </div>
+            @endforeach
+            
             <!-- Pagination -->
             <div class="flex justify-center items-center gap-2 mt-6">
                 {{ $bookings->links() }}
@@ -190,50 +254,51 @@
         </div>
     </div>
 </div>
-{{-- BAGIAN MODALS & SCRIPTS - Taruh setelah closing </div> dari booking list --}}
 
+{{-- MODALS - Unchanged from original, just keeping them intact --}}
 <!-- Modal Create/Edit Booking -->
-<div id="dataModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
-    <div class="bg-white rounded-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto my-8">
-        <h3 class="text-2xl font-bold text-gray-700 mb-6" id="modalTitle">Data diri</h3>
+<div id="dataModal" 
+     class="hidden fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl p-4 md:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+         <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-4 md:mb-6" id="modalTitle">Data diri</h3>
         <form id="bookingForm" method="POST">
             @csrf
             <input type="hidden" name="_method" id="formMethod" value="POST">
             
             <!-- Data Diri -->
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Nama Lengkap</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Nama Lengkap</label>
                 <input type="text" name="nama" id="nama" required
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                       class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
             </div>
             
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label class="block text-gray-700 mb-2">Nomor Whatsapp</label>
+                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Nomor Whatsapp</label>
                     <input type="text" name="nomor_telepon" id="nomor_telepon" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                           class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                 </div>
                 <div>
-                    <label class="block text-gray-700 mb-2">Email</label>
+                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Email</label>
                     <input type="email" name="email" id="email" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                           class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                 </div>
             </div>
             
             <div class="mb-6">
-                <label class="block text-gray-700 mb-2">Alamat Lengkap</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Alamat Lengkap</label>
                 <input type="text" name="alamat" id="alamat" required
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                       class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
             </div>
             
          <!-- Detail Kendaraan -->
-<h4 class="text-xl font-bold text-gray-700 mb-4">Detail Kendaraan</h4>
-<div class="grid grid-cols-2 gap-4 mb-6">
+<h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Detail Kendaraan</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
     <div>
-        <label class="block text-gray-700 mb-2">Jenis Kendaraan</label>
+        <label class="block text-gray-700 mb-2 text-sm md:text-base">Jenis Kendaraan</label>
         <select name="id_jenis_kendaraan" id="id_jenis_kendaraan" required 
                 onchange="calculateTotal()"
-                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
             <option value="">Pilih</option>
             @foreach($jenisKendaraans as $jenis)
             <option value="{{ $jenis->id_jenis_kendaraan }}" data-price="{{ $jenis->harga ?? 0 }}">
@@ -246,18 +311,18 @@
         </select>
     </div>
     <div>
-        <label class="block text-gray-700 mb-2">Nomor Polisi</label>
+        <label class="block text-gray-700 mb-2 text-sm md:text-base">Nomor Polisi</label>
         <input type="text" name="nomor_polisi" id="nomor_polisi" placeholder="DK 5984 AH"
-               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+               class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
     </div>
 </div>
             <!-- Pilihan Penanganan -->
-            <h4 class="text-xl font-bold text-gray-700 mb-4">Pilihan Penanganan</h4>
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Pilihan Penanganan</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-gray-700 mb-2">Jenis Penanganan</label>
+                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Jenis Penanganan</label>
                     <select name="id_Paket" id="id_Paket" required onchange="loadPaketPenanganan()"
-                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                         <option value="">Pilih Jenis Penanganan</option>
                         @foreach($pakets as $paket)
                         <option value="{{ $paket->id_Paket }}">
@@ -267,9 +332,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-gray-700 mb-2">Paket Penanganan</label>
+                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Paket Penanganan</label>
                     <select name="id_jenis_penanganan" id="id_jenis_penanganan" required onchange="calculateTotal()"
-                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                         <option value="">Pilih paket dulu</option>
                         @foreach($tingkatans as $tingkatan)
                         <option value="{{ $tingkatan->id_Tingkatan }}" data-price="{{ $tingkatan->harga }}">
@@ -282,9 +347,9 @@
             
             <!-- Addons Section -->
             <div class="mb-6">
-                <label class="block text-gray-700 mb-2 font-semibold">Tambahan Layanan (Addons)</label>
+                <label class="block text-gray-700 mb-2 font-semibold text-sm md:text-base">Tambahan Layanan (Addons)</label>
                 <select name="id_Addons" id="id_Addons" onchange="calculateTotal()"
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     <option value="">-- Tidak Ada --</option>
                     @foreach($addons as $addon)
                     <option value="{{ $addon->id_addons }}" data-price="{{ $addon->harga }}">
@@ -295,57 +360,57 @@
             </div>
             
             <!-- Pengaturan Jadwal -->
-            <h4 class="text-xl font-bold text-gray-700 mb-4">Pengaturan Jadwal</h4>
+            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Pengaturan Jadwal</h4>
             <div class="mb-6">
-                <label class="block text-gray-700 mb-2">Tanggal Pencucian</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Tanggal Pencucian</label>
                 <input type="datetime-local" name="tanggal" id="tanggal" required onchange="loadAvailablePegawai()"
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                       class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
             </div>
             
             <!-- Informasi Tambahan -->
-            <h4 class="text-xl font-bold text-gray-700 mb-4">Informasi Tambahan</h4>
+            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Informasi Tambahan</h4>
             <div class="mb-6">
-                <label class="block text-gray-700 mb-2">Catatan Untuk Pegawai</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Catatan Untuk Pegawai</label>
                 <textarea name="catatan" id="catatan"
-                          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                          class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base"></textarea>
             </div>
             
             <!-- Handle Admin -->
-            <h4 class="text-xl font-bold text-gray-700 mb-4">Handle (Admin)</h4>
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Handle (Admin)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-gray-700 mb-2">Pegawai</label>
+                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Pegawai</label>
                     <select name="id_Pegawai" id="id_Pegawai" required
-                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                         <option value="">Pilih tanggal dulu</option>
                     </select>
                     <p class="text-xs text-gray-500 mt-1" id="pegawai-info"></p>
                 </div>
                 <div>
-                    <label class="block text-gray-700 mb-2">Admin</label>
+                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Admin</label>
                     <input type="text" value="Anda" readonly
-                           class="w-full px-4 py-2 border rounded-lg bg-gray-100">
+                           class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 text-sm md:text-base">
                 </div>
             </div>
 
             <!-- PAYMENT SECTION -->
             <div class="border-t-2 pt-6 mt-6">
-                <h4 class="text-xl font-bold text-gray-700 mb-4">Informasi Pembayaran</h4>
+                <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Informasi Pembayaran</h4>
                 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-gray-700 mb-2">Metode Pembayaran</label>
+                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Metode Pembayaran</label>
                         <select name="metode" id="metode" required onchange="toggleDiskonField()"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                             <option value="">Pilih Metode</option>
                             <option value="Tunai">Tunai</option>
                             <option value="Non Tunai">Non Tunai</option>
                         </select>
                     </div>
                     <div id="diskonField" style="display: none;">
-                        <label class="block text-gray-700 mb-2">Diskon (Opsional)</label>
+                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Diskon (Opsional)</label>
                         <select name="id_Diskon" id="diskon" onchange="calculateTotal()"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                             <option value="">Tanpa Diskon</option>
                             @foreach($diskons as $diskon)
                             <option value="{{ $diskon->id_Diskon }}" data-persen="{{ $diskon->persen }}">
@@ -356,30 +421,30 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4" id="jumlahUangField" style="display: none;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4" id="jumlahUangField" style="display: none;">
                     <div>
-                        <label class="block text-gray-700 mb-2">Jumlah Uang</label>
+                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Jumlah Uang</label>
                         <input type="number" name="jumlah_uang" id="jumlah_uang" oninput="calculateKembalian()"
-                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                               class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     </div>
                     <div>
-                        <label class="block text-gray-700 mb-2">Kembalian</label>
+                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Kembalian</label>
                         <input type="number" name="kembalian" id="kembalian" readonly
-                               class="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed text-green-600 font-bold">
+                               class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed text-green-600 font-bold text-sm md:text-base">
                     </div>
                 </div>
 
-                <div class="mt-4 p-4 bg-teal-50 rounded-lg">
-                    <p class="text-lg font-bold text-gray-700">Total Harga: <span id="totalHarga">Rp 0</span></p>
+                <div class="mt-4 p-3 md:p-4 bg-teal-50 rounded-lg">
+                    <p class="text-base md:text-lg font-bold text-gray-700">Total Harga: <span id="totalHarga">Rp 0</span></p>
                 </div>
             </div>
             
-            <div class="flex justify-end gap-2 mt-6">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
                 <button type="button" onclick="closeModal('dataModal')" 
-                        class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                        class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
                     Batal
                 </button>
-                <button type="submit" class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600">
+                <button type="submit" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base">
                     Konfirmasi
                 </button>
             </div>
@@ -387,27 +452,28 @@
     </div>
 </div>
 
+<!-- Remaining modals with responsive styling... -->
 <!-- Modal Assign Pegawai -->
-<div id="assignPegawaiModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md">
-        <h3 class="text-2xl font-bold text-gray-700 mb-6">Pilih Pegawai</h3>
+<div id="assignPegawaiModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg p-4 md:p-8 w-full max-w-md">
+        <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-4 md:mb-6">Pilih Pegawai</h3>
         <form id="assignPegawaiForm" method="POST">
             @csrf
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Pegawai Tersedia</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Pegawai Tersedia</label>
                 <select name="id_pegawai" id="assign_id_pegawai" required
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     <option value="">Loading...</option>
                 </select>
                 <p class="text-xs text-gray-500 mt-1" id="assign-pegawai-info"></p>
             </div>
             
-            <div class="flex justify-end gap-2">
+            <div class="flex flex-col sm:flex-row justify-end gap-2">
                 <button type="button" onclick="closeModal('assignPegawaiModal')" 
-                        class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                        class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
                     Batal
                 </button>
-                <button type="submit" class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600">
+                <button type="submit" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base">
                     Tugaskan
                 </button>
             </div>
@@ -415,24 +481,24 @@
     </div>
 </div>
 
-<!-- Modal Payment (untuk user booking yang diubah ke Done) -->
-<div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md">
-        <h3 class="text-2xl font-bold text-gray-700 mb-6">Metode</h3>
+<!-- Modal Payment -->
+<div id="paymentModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg p-4 md:p-8 w-full max-w-md">
+        <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-4 md:mb-6">Metode</h3>
         <form id="paymentForm" method="POST">
             @csrf
             <input type="hidden" name="status" value="Done">
             
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Jumlah Harga</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Jumlah Harga</label>
                 <input type="text" id="payment_harga" readonly
-                       class="w-full px-4 py-2 border rounded-lg bg-gray-100">
+                       class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 text-sm md:text-base">
             </div>
             
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Metode</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Metode</label>
                 <select name="metode" id="payment_metode" required onchange="togglePaymentDiskon()"
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     <option value="">Pilih Metode</option>
                     <option value="Tunai">Tunai</option>
                     <option value="Non Tunai">Non Tunai</option>
@@ -440,9 +506,9 @@
             </div>
             
             <div class="mb-4" id="payment_diskon_field" style="display: none;">
-                <label class="block text-gray-700 mb-2">Diskon</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Diskon</label>
                 <select name="id_diskon" id="payment_diskon" onchange="calculatePaymentTotal()"
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     <option value="">Tanpa Diskon</option>
                     @foreach($diskons as $diskon)
                     <option value="{{ $diskon->id_Diskon }}" data-persen="{{ $diskon->persen }}">
@@ -453,23 +519,23 @@
             </div>
             
             <div class="mb-4" id="payment_jumlah_field" style="display: none;">
-                <label class="block text-gray-700 mb-2">Jumlah Uang</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Jumlah Uang</label>
                 <input type="number" name="jumlah_uang" id="payment_jumlah_uang" oninput="calculatePaymentKembalian()"
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                       class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
             </div>
             
             <div class="mb-4" id="payment_kembalian_field" style="display: none;">
-                <label class="block text-gray-700 mb-2">Kembalian</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Kembalian</label>
                 <input type="number" id="payment_kembalian" readonly
-                       class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-green-600 font-bold">
+                       class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 text-green-600 font-bold text-sm md:text-base">
             </div>
             
-            <div class="flex justify-end gap-2">
+            <div class="flex flex-col sm:flex-row justify-end gap-2">
                 <button type="button" onclick="closeModal('paymentModal')" 
-                        class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                        class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
                     Batal
                 </button>
-                <button type="submit" class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600">
+                <button type="submit" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base">
                     Konfirmasi
                 </button>
             </div>
@@ -478,35 +544,35 @@
 </div>
 
 <!-- Modal Message -->
-<div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md">
-        <h3 class="text-2xl font-bold text-gray-700 mb-6">Massage</h3>
+<div id="messageModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg p-4 md:p-8 w-full max-w-md">
+        <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-4 md:mb-6">Massage</h3>
         <form id="messageForm" method="POST">
             @csrf
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Email</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Email</label>
                 <div class="relative">
                     <input type="email" name="email" id="msg_email" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                           class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     <button type="button" class="absolute right-2 top-2 text-gray-400">📋</button>
                 </div>
             </div>
             
             <div class="mb-6">
-                <label class="block text-gray-700 mb-2">Whatsapp</label>
+                <label class="block text-gray-700 mb-2 text-sm md:text-base">Whatsapp</label>
                 <div class="relative">
                     <input type="text" name="whatsapp" id="msg_whatsapp" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                           class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
                     <button type="button" class="absolute right-2 top-2 text-gray-400">📋</button>
                 </div>
             </div>
             
-            <div class="flex justify-end">
+            <div class="flex flex-col sm:flex-row justify-end gap-2">
                 <button type="button" onclick="closeModal('messageModal')" 
-                        class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 mr-2">
+                        class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
                     Batal
                 </button>
-                <button type="submit" class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600">
+                <button type="submit" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base">
                     Konfirmasi
                 </button>
             </div>
@@ -515,18 +581,18 @@
 </div>
 
 <!-- Modal View -->
-<div id="viewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <h3 class="text-2xl font-bold text-gray-700 mb-6">Detail Booking</h3>
-        <div id="viewContent" class="mb-6">
+<div id="viewModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg p-4 md:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-4 md:mb-6">Detail Booking</h3>
+        <div id="viewContent" class="mb-4 md:mb-6">
             <!-- Content will be loaded dynamically -->
         </div>
-        <div class="flex justify-between mt-6">
+        <div class="flex flex-col sm:flex-row justify-between mt-4 md:mt-6 gap-2">
             <button onclick="closeModal('viewModal')" 
-                    class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                    class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base order-2 sm:order-1">
                 Tutup
             </button>
-            <div class="flex gap-2" id="viewModalActions">
+            <div class="flex flex-col sm:flex-row gap-2 order-1 sm:order-2" id="viewModalActions">
                 <!-- Actions will be loaded dynamically -->
             </div>
         </div>
@@ -534,15 +600,15 @@
 </div>
 
 <!-- Modal Unassigned Bookings -->
-<div id="unassignedModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <h3 class="text-2xl font-bold text-gray-700 mb-6">Booking Menunggu Penugasan Pegawai</h3>
-        <div id="unassignedContent" class="mb-6">
+<div id="unassignedModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg p-4 md:p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-4 md:mb-6">Booking Menunggu Penugasan Pegawai</h3>
+        <div id="unassignedContent" class="mb-4 md:mb-6">
             <!-- Content will be loaded dynamically -->
         </div>
-        <div class="flex justify-end mt-6">
+        <div class="flex justify-end mt-4 md:mt-6">
             <button onclick="closeModal('unassignedModal')" 
-                    class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                    class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
                 Tutup
             </button>
         </div>
@@ -630,7 +696,6 @@ function loadAvailablePegawai() {
 }
 
 // Calculate total price
-// Calculate total price - FIXED VERSION
 function calculateTotal() {
     console.log('=== CALCULATE TOTAL CALLED ===');
     
@@ -712,6 +777,7 @@ function toggleDiskonField() {
 function loadPaketPenanganan() {
     calculateTotal();
 }
+
 function openCreateModal() {
     document.getElementById('modalTitle').textContent = 'Data diri';
     document.getElementById('bookingForm').action = '{{ route("admin.bookings.store") }}';
@@ -727,7 +793,6 @@ function openViewModal(id) {
     
     console.log('=== OPENING VIEW MODAL ===');
     console.log('Booking ID:', id);
-    console.log('Fetch URL:', `/admin/bookings/${id}/details`);
     
     fetch(`/admin/bookings/${id}/details`, {
         method: 'GET',
@@ -737,86 +802,75 @@ function openViewModal(id) {
         },
         credentials: 'same-origin'
     })
-    .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('=== BOOKING DATA RECEIVED ===');
-        console.log('Full data:', data);
-        console.log('Paket:', data.paket);
-        console.log('Pegawai:', data.pegawai);
-        console.log('Addons:', data.addons);
-        console.log('Jenis Kendaraan:', data.jenis_kendaraan);
-        
         const content = `
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <p class="text-sm text-gray-600">Nama</p>
-                    <p class="font-bold">${data.nama || '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Nama</p>
+                    <p class="font-bold text-sm md:text-base">${data.nama || '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Email</p>
-                    <p class="font-bold">${data.email || '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Email</p>
+                    <p class="font-bold text-sm md:text-base break-all">${data.email || '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Nomor Telepon</p>
-                    <p class="font-bold">${data.nomor_telepon || '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Nomor Telepon</p>
+                    <p class="font-bold text-sm md:text-base">${data.nomor_telepon || '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Alamat</p>
-                    <p class="font-bold">${data.alamat || '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Alamat</p>
+                    <p class="font-bold text-sm md:text-base">${data.alamat || '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Nomor Polisi</p>
-                    <p class="font-bold">${data.nomor_polisi || '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Nomor Polisi</p>
+                    <p class="font-bold text-sm md:text-base">${data.nomor_polisi || '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Status</p>
-                    <p class="font-bold ${data.status === 'Done' ? 'text-green-600' : data.status === 'Canceled' ? 'text-red-600' : 'text-orange-600'}">${data.status || '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Status</p>
+                    <p class="font-bold text-sm md:text-base ${data.status === 'Done' ? 'text-green-600' : data.status === 'Canceled' ? 'text-red-600' : 'text-orange-600'}">${data.status || '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Jenis Kendaraan</p>
-                    <p class="font-bold">${data.jenis_kendaraan ? data.jenis_kendaraan.jenis_kendaraan : '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Jenis Kendaraan</p>
+                    <p class="font-bold text-sm md:text-base">${data.jenis_kendaraan ? data.jenis_kendaraan.jenis_kendaraan : '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Paket</p>
-                    <p class="font-bold">${data.paket ? data.paket.kategori_paket : '-'}</p>
-                    ${data.paket && data.paket.tingkatan ? `<p class="text-sm text-gray-500">${data.paket.tingkatan.tingkatan}</p>` : ''}
+                    <p class="text-xs md:text-sm text-gray-600">Paket</p>
+                    <p class="font-bold text-sm md:text-base">${data.paket ? data.paket.kategori_paket : '-'}</p>
+                    ${data.paket && data.paket.tingkatan ? `<p class="text-xs md:text-sm text-gray-500">${data.paket.tingkatan.tingkatan}</p>` : ''}
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Tanggal</p>
-                    <p class="font-bold">${data.tanggal ? new Date(data.tanggal).toLocaleString('id-ID') : '-'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Tanggal</p>
+                    <p class="font-bold text-sm md:text-base">${data.tanggal ? new Date(data.tanggal).toLocaleString('id-ID') : '-'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Harga</p>
-                    <p class="font-bold text-teal-600">Rp ${data.harga ? new Intl.NumberFormat('id-ID').format(data.harga) : '0'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Harga</p>
+                    <p class="font-bold text-sm md:text-base text-teal-600">Rp ${data.harga ? new Intl.NumberFormat('id-ID').format(data.harga) : '0'}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Pegawai</p>
-                    <p class="font-bold ${data.pegawai ? 'text-green-600' : 'text-orange-600'}">
+                    <p class="text-xs md:text-sm text-gray-600">Pegawai</p>
+                    <p class="font-bold text-sm md:text-base ${data.pegawai ? 'text-green-600' : 'text-orange-600'}">
                         ${data.pegawai ? '✓ ' + data.pegawai.nama : '⚠️ Belum Ditugaskan'}
                     </p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Addons</p>
-                    <p class="font-bold">${data.addons ? data.addons.nama + ' (+Rp ' + new Intl.NumberFormat('id-ID').format(data.addons.harga) + ')' : 'Tidak Ada'}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Addons</p>
+                    <p class="font-bold text-sm md:text-base">${data.addons ? data.addons.nama + ' (+Rp ' + new Intl.NumberFormat('id-ID').format(data.addons.harga) + ')' : 'Tidak Ada'}</p>
                 </div>
-                <div class="col-span-2">
-                    <p class="text-sm text-gray-600">Catatan</p>
-                    <p class="font-bold">${data.catatan || 'Tidak ada catatan'}</p>
+                <div class="col-span-1 md:col-span-2">
+                    <p class="text-xs md:text-sm text-gray-600">Catatan</p>
+                    <p class="font-bold text-sm md:text-base">${data.catatan || 'Tidak ada catatan'}</p>
                 </div>
                 ${data.metode ? `
                 <div>
-                    <p class="text-sm text-gray-600">Metode Pembayaran</p>
-                    <p class="font-bold">${data.metode}</p>
+                    <p class="text-xs md:text-sm text-gray-600">Metode Pembayaran</p>
+                    <p class="font-bold text-sm md:text-base">${data.metode}</p>
                 </div>
                 ` : ''}
                 ${data.diskon && data.diskon > 0 ? `
                 <div>
-                    <p class="text-sm text-gray-600">Diskon</p>
-                    <p class="font-bold text-green-600">${data.diskon}%</p>
+                    <p class="text-xs md:text-sm text-gray-600">Diskon</p>
+                    <p class="font-bold text-sm md:text-base text-green-600">${data.diskon}%</p>
                 </div>
                 ` : ''}
             </div>
@@ -827,7 +881,7 @@ function openViewModal(id) {
         if (data.status === 'Done') {
             actionsDiv.innerHTML = `
                 <button onclick="viewInvoice()" 
-                        class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                        class="bg-blue-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-blue-600 text-sm md:text-base">
                     View Invoice
                 </button>
             `;
@@ -835,13 +889,10 @@ function openViewModal(id) {
             actionsDiv.innerHTML = '';
         }
         
-        console.log('Modal content updated successfully');
         document.getElementById('viewModal').classList.remove('hidden');
     })
     .catch(error => {
-        console.error('=== ERROR ===');
         console.error('Error:', error);
-        console.error('Stack:', error.stack);
         alert('Gagal memuat detail booking: ' + error.message);
     });
 }
@@ -915,66 +966,39 @@ function updateStatus(id, status, needsPayment = false) {
         dropdown.classList.add('hidden');
     }
     
-    // Convert string to boolean if needed
     const isUserBooking = needsPayment === true || needsPayment === 'true';
     
-    console.log('=== UPDATE STATUS CALLED ===');
-    console.log('ID:', id);
-    console.log('Status:', status);
-    console.log('Needs Payment (original):', needsPayment);
-    console.log('Is User Booking:', isUserBooking);
-    
     if (!confirm(`Apakah Anda yakin ingin mengubah status menjadi ${status}?`)) {
-        console.log('User cancelled confirmation');
         return;
     }
     
-    // If changing to Done and it's a user booking (no payment data), show payment modal
     if (status === 'Done' && isUserBooking) {
-        console.log('✓ User booking detected, showing payment modal');
         currentBookingId = id;
         showPaymentModal(id);
         return;
     }
     
-    console.log('✓ Admin booking or Canceled status, updating directly');
-    // Otherwise, update status directly (admin booking or changing to Canceled)
     performStatusUpdate(id, status);
 }
 
 function showPaymentModal(bookingId) {
-    console.log('=== SHOW PAYMENT MODAL ===');
-    console.log('Booking ID:', bookingId);
-    
     fetch(`/admin/bookings/${bookingId}/details`)
-    .then(response => {
-        console.log('Details response status:', response.status);
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Booking details:', data);
-        console.log('Harga from server:', data.harga);
-        
-        // Store original price
         currentBookingHarga = parseInt(data.harga) || 0;
-        console.log('currentBookingHarga set to:', currentBookingHarga);
         
-        // Reset form
         document.getElementById('payment_metode').value = '';
         document.getElementById('payment_diskon').value = '';
         document.getElementById('payment_jumlah_uang').value = '';
         document.getElementById('payment_kembalian').value = '0';
         
-        // Hide all optional fields
         document.getElementById('payment_diskon_field').style.display = 'none';
         document.getElementById('payment_jumlah_field').style.display = 'none';
         document.getElementById('payment_kembalian_field').style.display = 'none';
         
-        // Display original price
         document.getElementById('payment_harga').value = 'Rp ' + currentBookingHarga.toLocaleString('id-ID');
         document.getElementById('paymentForm').action = `/admin/bookings/${bookingId}/status`;
         
-        console.log('Opening payment modal');
         document.getElementById('paymentModal').classList.remove('hidden');
     })
     .catch(error => {
@@ -989,33 +1013,23 @@ function togglePaymentDiskon() {
     const jumlahField = document.getElementById('payment_jumlah_field');
     const kembalianField = document.getElementById('payment_kembalian_field');
     
-    console.log('=== TOGGLE PAYMENT DISKON ===');
-    console.log('Metode selected:', metode);
-    console.log('Current booking harga:', currentBookingHarga);
-    
     if (metode === 'Tunai') {
         diskonField.style.display = 'block';
         jumlahField.style.display = 'block';
         kembalianField.style.display = 'block';
-        console.log('✓ Showing Tunai fields');
     } else if (metode === 'Non Tunai') {
         diskonField.style.display = 'none';
         jumlahField.style.display = 'none';
         kembalianField.style.display = 'none';
-        // Reset values
         document.getElementById('payment_diskon').value = '';
         document.getElementById('payment_jumlah_uang').value = '';
         document.getElementById('payment_kembalian').value = '0';
-        console.log('✓ Hiding Tunai fields (Non Tunai selected)');
     } else {
-        // No metode selected
         diskonField.style.display = 'none';
         jumlahField.style.display = 'none';
         kembalianField.style.display = 'none';
-        console.log('✓ No metode selected');
     }
     
-    // Recalculate total
     calculatePaymentTotal();
 }
 
@@ -1024,31 +1038,16 @@ function calculatePaymentTotal() {
     const metode = document.getElementById('payment_metode').value;
     const hargaInput = document.getElementById('payment_harga');
     
-    console.log('=== CALCULATE PAYMENT TOTAL ===');
-    console.log('Original Harga:', currentBookingHarga);
-    console.log('Metode:', metode);
-    
     let finalTotal = currentBookingHarga;
     
-    // Apply discount only if Tunai and discount selected
     if (metode === 'Tunai' && diskonSelect.value) {
         const selectedOption = diskonSelect.options[diskonSelect.selectedIndex];
         const diskonPersen = parseInt(selectedOption.getAttribute('data-persen') || '0');
         const diskonAmount = Math.floor((currentBookingHarga * diskonPersen) / 100);
         finalTotal = currentBookingHarga - diskonAmount;
-        
-        console.log('Discount:', diskonPersen + '%');
-        console.log('Discount amount:', diskonAmount);
-        console.log('Final total after discount:', finalTotal);
-    } else {
-        console.log('No discount applied');
     }
     
-    // Update display
     hargaInput.value = 'Rp ' + finalTotal.toLocaleString('id-ID');
-    console.log('Display updated to:', hargaInput.value);
-    
-    // Recalculate kembalian
     calculatePaymentKembalian();
 }
 
@@ -1057,71 +1056,30 @@ function calculatePaymentKembalian() {
     const jumlahUangInput = document.getElementById('payment_jumlah_uang');
     const kembalianInput = document.getElementById('payment_kembalian');
     
-    console.log('=== CALCULATE PAYMENT KEMBALIAN ===');
-    
-    // Get current total from display
     const hargaText = hargaInput.value;
-    console.log('Harga text:', hargaText);
-    
-    // Parse: "Rp 170.000" -> 170000
     const total = parseInt(hargaText.replace(/\D/g, '') || '0');
-    console.log('Total (parsed):', total);
-    
-    // Get jumlah uang
-    const jumlahUangValue = jumlahUangInput.value;
-    const jumlahUang = parseInt(jumlahUangValue || '0');
-    console.log('Jumlah uang:', jumlahUang);
-    
-    // Calculate kembalian
+    const jumlahUang = parseInt(jumlahUangInput.value || '0');
     const kembalian = jumlahUang - total;
-    console.log('Kembalian calculated:', kembalian);
-    
-    // Display (0 if negative)
     const displayValue = kembalian >= 0 ? kembalian : 0;
     kembalianInput.value = displayValue;
-    console.log('Kembalian displayed:', displayValue);
     
-    // Color feedback
     if (kembalian < 0) {
         kembalianInput.classList.remove('text-green-600');
         kembalianInput.classList.add('text-red-600');
-        console.log('Color: RED (insufficient)');
     } else {
         kembalianInput.classList.remove('text-red-600');
         kembalianInput.classList.add('text-green-600');
-        console.log('Color: GREEN (sufficient)');
     }
-    
-    console.log('=== END KEMBALIAN CALCULATION ===');
 }
 
-// Test function - call this from browser console to debug
-function testPaymentCalculation() {
-    console.log('=== PAYMENT CALCULATION TEST ===');
-    console.log('currentBookingHarga:', currentBookingHarga);
-    console.log('payment_harga value:', document.getElementById('payment_harga').value);
-    console.log('payment_jumlah_uang value:', document.getElementById('payment_jumlah_uang').value);
-    console.log('payment_kembalian value:', document.getElementById('payment_kembalian').value);
-    
-    // Force recalculation
-    calculatePaymentKembalian();
-}
 function performStatusUpdate(id, status, paymentData = null) {
     const requestData = { status: status };
     
     if (paymentData) {
         Object.assign(requestData, paymentData);
     } else if (status === 'Done') {
-        // Untuk admin booking yang sudah punya metode, kirim flag khusus
         requestData.skip_metode_validation = true;
     }
-    
-    console.log('=== PERFORM STATUS UPDATE ===');
-    console.log('Booking ID:', id);
-    console.log('Status:', status);
-    console.log('Payment Data:', paymentData);
-    console.log('Request Data:', requestData);
-    console.log('Request URL:', `/admin/bookings/${id}/status`);
     
     fetch(`/admin/bookings/${id}/status`, {
         method: 'PATCH',
@@ -1135,33 +1093,23 @@ function performStatusUpdate(id, status, paymentData = null) {
         body: JSON.stringify(requestData)
     })
     .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        
         if (!response.ok) {
             return response.text().then(text => {
-                console.error('Response text:', text);
                 throw new Error(`HTTP ${response.status}: ${text}`);
             });
         }
         return response.json();
     })
     .then(data => {
-        console.log('Response data:', data);
-        
         if (data.success) {
             alert(data.message || 'Status berhasil diupdate');
             location.reload();
         } else {
-            const errorMsg = data.message || 'Unknown error';
-            console.error('Update failed:', errorMsg, data);
-            alert('Gagal update status: ' + errorMsg);
+            alert('Gagal update status: ' + (data.message || 'Unknown error'));
         }
     })
     .catch(error => {
-        console.error('=== FETCH ERROR ===');
         console.error('Error:', error);
-        console.error('Stack:', error.stack);
         alert('Terjadi kesalahan saat update status: ' + error.message);
     });
 }
@@ -1188,22 +1136,22 @@ function viewUnassignedBookings() {
         if (data.success) {
             let content = '';
             if (data.data.length === 0) {
-                content = '<p class="text-center text-gray-500">Tidak ada booking yang menunggu penugasan pegawai</p>';
+                content = '<p class="text-center text-gray-500 text-sm md:text-base">Tidak ada booking yang menunggu penugasan pegawai</p>';
             } else {
                 content = '<div class="space-y-4">';
                 data.data.forEach(booking => {
                     content += `
-                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-bold text-lg">${booking.nama}</h4>
-                                    <p class="text-sm text-gray-600">${booking.email}</p>
-                                    <p class="text-sm text-gray-600">${booking.jenis_kendaraan ? booking.jenis_kendaraan.jenis_kendaraan : '-'}</p>
-                                    <p class="text-sm text-gray-600">Tanggal: ${new Date(booking.tanggal).toLocaleString('id-ID')}</p>
-                                    <p class="text-lg font-bold text-teal-600 mt-2">Rp ${new Intl.NumberFormat('id-ID').format(booking.harga)}</p>
+                        <div class="bg-gray-50 rounded-lg p-3 md:p-4 border border-gray-200">
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-3">
+                                <div class="w-full md:w-auto">
+                                    <h4 class="font-bold text-base md:text-lg">${booking.nama}</h4>
+                                    <p class="text-xs md:text-sm text-gray-600 break-all">${booking.email}</p>
+                                    <p class="text-xs md:text-sm text-gray-600">${booking.jenis_kendaraan ? booking.jenis_kendaraan.jenis_kendaraan : '-'}</p>
+                                    <p class="text-xs md:text-sm text-gray-600">Tanggal: ${new Date(booking.tanggal).toLocaleString('id-ID')}</p>
+                                    <p class="text-base md:text-lg font-bold text-teal-600 mt-2">Rp ${new Intl.NumberFormat('id-ID').format(booking.harga)}</p>
                                 </div>
                                 <button onclick="openAssignPegawaiModal(${booking.id_Booking}, '${booking.tanggal}')" 
-                                        class="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+                                        class="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base w-full md:w-auto whitespace-nowrap">
                                     Pilih Pegawai
                                 </button>
                             </div>
@@ -1332,17 +1280,11 @@ document.getElementById('paymentForm').addEventListener('submit', function(e) {
         jumlah_uang: formData.get('jumlah_uang') || null
     };
     
-    console.log('=== PAYMENT FORM SUBMIT ===');
-    console.log('Booking ID:', currentBookingId);
-    console.log('Payment Data:', paymentData);
-    
-    // Validate metode
     if (!paymentData.metode) {
         alert('Metode pembayaran harus diisi!');
         return;
     }
     
-    // Validate jumlah_uang for Tunai
     if (paymentData.metode === 'Tunai' && !paymentData.jumlah_uang) {
         alert('Jumlah uang harus diisi untuk metode Tunai!');
         return;

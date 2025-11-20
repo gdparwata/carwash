@@ -45,7 +45,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">Informasi Kendaraan</h3>
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <p><strong>Nomor Polisi:</strong> {{ $booking->nomor_polisi ?? '-' }}</p>
-                        <p><strong>Jenis:</strong> {{ $booking->jenis_Kendaraan->jenis_kendaraan ?? '-' }}</p>
+                        <p><strong>Jenis:</strong> {{ $booking->jenisKendaraan->jenis_kendaraan ?? '-' }}</p>
                         <p><strong>Tanggal Service:</strong> {{ \Carbon\Carbon::parse($booking->tanggal)->format('d M Y, H:i') }}</p>
                         <p><strong>Pegawai:</strong> {{ $booking->pegawai->nama ?? '-' }}</p>
                     </div>
@@ -63,60 +63,89 @@
                             <th class="border border-gray-300 p-3 text-right">Harga</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border border-gray-300 p-3">{{ $booking->paket->nama_paket ?? '-' }}</td>
-                            <td class="border border-gray-300 p-3 text-sm text-gray-600">
-                                {{ $booking->paket->deskripsi ?? 'Paket cuci mobil standar' }}
-                            </td>
-                            <td class="border border-gray-300 p-3 text-right">
-                                Rp {{ number_format($booking->paket->harga ?? 0, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        
-                        @if($booking->addons)
-                        <tr>
-                            <td class="border border-gray-300 p-3">{{ $booking->addons->nama ?? 'Add-on Service' }}</td>
-                            <td class="border border-gray-300 p-3 text-sm text-gray-600">
-                                {{ $booking->addons->deskripsi ?? 'Layanan tambahan' }}
-                            </td>
-                            <td class="border border-gray-300 p-3 text-right">
-                                Rp {{ number_format($booking->addons->harga ?? 0, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        @endif
+<tbody>
+  @php
+    $hargaKendaraan = $booking->jenisKendaraan->harga ?? 0;
+    $hargaPaket = $booking->paket->tingkatan->harga ?? $booking->paket->harga ?? 0;
+    $hargaAddons = $booking->addons->harga ?? 0;
+    $diskonPersen = $booking->diskon ?? 0;
 
-                        @if($booking->diskon && $booking->diskon > 0)
-                        <tr>
-                            <td class="border border-gray-300 p-3 text-red-600">Diskon</td>
-                            <td class="border border-gray-300 p-3 text-sm text-gray-600">
-                                {{ $booking->diskon_obj->nama ?? 'Diskon khusus' }}
-                            </td>
-                            <td class="border border-gray-300 p-3 text-right text-red-600">
-                                - Rp {{ number_format($booking->diskon, 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        @endif
-                    </tbody>
-                </table>
+    $subtotal = $hargaKendaraan + $hargaPaket + $hargaAddons;
+    $diskonNilai = ($subtotal * $diskonPersen) / 100;
+    $totalAkhir = $subtotal - $diskonNilai;
+@endphp
+
+<tr>
+    <td class="border border-gray-300 p-3">Jenis Kendaraan</td>
+    <td class="border border-gray-300 p-3 text-sm text-gray-600">
+        {{ $booking->jenisKendaraan->jenis_kendaraan ?? '-' }}
+    </td>
+    <td class="border border-gray-300 p-3 text-right">
+        Rp {{ number_format($hargaKendaraan, 0, ',', '.') }}
+    </td>
+</tr>
+
+<tr>
+    <td class="border border-gray-300 p-3">Paket</td>
+    <td class="border border-gray-300 p-3 text-sm text-gray-600">
+        {{ $booking->paket->kategori_paket ?? '-' }}
+    </td>
+    <td class="border border-gray-300 p-3 text-right">
+        Rp {{ number_format($hargaPaket, 0, ',', '.') }}
+    </td>
+</tr>
+
+@if($booking->addons)
+<tr>
+    <td class="border border-gray-300 p-3">{{ $booking->addons->nama }}</td>
+    <td class="border border-gray-300 p-3 text-sm text-gray-600">{{ $booking->addons->deskripsi ?? '-' }}</td>
+    <td class="border border-gray-300 p-3 text-right">
+        Rp {{ number_format($hargaAddons, 0, ',', '.') }}
+    </td>
+</tr>
+@endif
+
+<tr>
+    <td colspan="2" class="text-right font-semibold">Subtotal</td>
+    <td class="text-right">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+</tr>
+
+@if($diskonPersen > 0)
+<tr>
+    <td colspan="2" class="text-right text-red-600">Diskon ({{ $diskonPersen }}%)</td>
+    <td class="text-right text-red-600">- Rp {{ number_format($diskonNilai, 0, ',', '.') }}</td>
+</tr>
+@endif
+
+<tr>
+    <td colspan="2" class="text-right font-bold text-lg">Total</td>
+    <td class="text-right font-bold text-lg">
+        Rp {{ number_format($totalAkhir, 0, ',', '.') }}
+    </td>
+</tr>
+</tbody>
+
+
+</table>
             </div>
 
             <!-- Total -->
             <div class="flex justify-end mb-8">
-                <div class="w-64">
-                    <div class="bg-teal-50 p-4 rounded-lg border-2 border-teal-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-semibold text-gray-800">Total Pembayaran:</span>
-                            <span class="text-xl font-bold text-teal-600">
-                                Rp {{ number_format($booking->harga ?? 0, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <div class="text-sm text-gray-600 mt-1">
-                            Metode: {{ ucfirst($booking->metode ?? 'cash') }}
-                        </div>
-                    </div>
-                </div>
+    <div class="w-64">
+        <div class="bg-teal-50 p-4 rounded-lg border-2 border-teal-200">
+            <div class="flex justify-between items-center">
+                <span class="text-lg font-semibold text-gray-800">Total Pembayaran:</span>
+                <span class="text-xl font-bold text-teal-600">
+                    Rp {{ number_format($totalAkhir, 0, ',', '.') }}
+                </span>
             </div>
+            <div class="text-sm text-gray-600 mt-1">
+                Metode: {{ ucfirst($booking->metode ?? 'cash') }}
+            </div>
+        </div>
+    </div>
+</div>
+
 
             <!-- Notes -->
             @if($booking->catatan)

@@ -34,8 +34,7 @@ class Booking extends Model
         'id_jenis_kendaraan',
         'id_addons',
         'id_Diskon',
-       
-        
+        'id_jenis_penanganan', // 👈 TAMBAHKAN INI (foreign key ke tingkatans)
     ];
 
     protected $casts = [
@@ -47,17 +46,11 @@ class Booking extends Model
         'kembalian' => 'decimal:2',
     ];
 
-    /**
-     * Get the route key for the model
-     */
     public function getRouteKeyName()
     {
         return 'id_Booking';
     }
 
-    /**
-     * Resolve route model binding to use the correct key
-     */
     public function resolveRouteBinding($value, $field = null)
     {
         return $this->where('id_Booking', $value)->firstOrFail();
@@ -72,7 +65,7 @@ class Booking extends Model
 
     public function paket()
     {
-        return $this->belongsTo(Paket::class, 'id_paket', 'id_Paket');
+        return $this->belongsTo(Paket::class, 'id_Paket', 'id_Paket');
     }
 
     public function pegawai()
@@ -93,6 +86,12 @@ class Booking extends Model
     public function diskon()
     {
         return $this->belongsTo(Diskon::class, 'id_Diskon', 'id_Diskon');
+    }
+
+    // 🔥 RELASI BARU - DIRECT KE TINGKATAN
+    public function tingkatan()
+    {
+        return $this->belongsTo(Tingkatan::class, 'id_jenis_penanganan', 'id_Tingkatan');
     }
 
     public function invoice()
@@ -176,10 +175,11 @@ class Booking extends Model
             ];
         }
 
-        if ($this->paket && $this->paket->tingkatan) {
+        // 🔥 GUNAKAN relasi tingkatan langsung
+        if ($this->tingkatan) {
             $breakdown['Paket Penanganan'] = [
-                'nama' => $this->paket->tingkatan->Tingkatan,
-                'harga' => $this->paket->tingkatan->harga ?? 0
+                'nama' => $this->tingkatan->Tingkatan,
+                'harga' => $this->tingkatan->harga ?? 0
             ];
         }
 
@@ -204,8 +204,9 @@ class Booking extends Model
             $subtotal += $this->jenisKendaraan->harga ?? 0;
         }
 
-        if ($this->paket && $this->paket->tingkatan) {
-            $subtotal += $this->paket->tingkatan->harga ?? 0;
+        // 🔥 GUNAKAN relasi tingkatan langsung
+        if ($this->tingkatan) {
+            $subtotal += $this->tingkatan->harga ?? 0;
         }
 
         if ($this->addons) {

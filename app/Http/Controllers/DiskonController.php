@@ -35,12 +35,36 @@ class DiskonController extends Controller
     public function show($id)
     {
         try {
+            // Debug: Log ID yang diterima
+            \Log::info('ID Diterima: ' . $id);
+            \Log::info('Primary Key Model: ' . (new Diskon())->getKeyName());
+            
+            // Coba berbagai cara untuk mencari
             $diskon = Diskon::find($id);
+            
+            // Jika tidak ketemu, coba cari di semua data
+            if (!$diskon) {
+                \Log::info('Tidak ditemukan dengan find()');
+                \Log::info('Total Diskon: ' . Diskon::count());
+                \Log::info('Semua ID: ' . Diskon::pluck('id_Diskon')->toJson());
+                
+                // Coba cari dengan where
+                $diskon = Diskon::where('id_Diskon', $id)->first();
+                
+                if ($diskon) {
+                    \Log::info('Ditemukan dengan where clause');
+                }
+            }
             
             if (!$diskon) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Diskon tidak ditemukan'
+                    'message' => 'Diskon tidak ditemukan',
+                    'debug' => [
+                        'id_requested' => $id,
+                        'total_records' => Diskon::count(),
+                        'available_ids' => Diskon::pluck('id_Diskon')->toArray()
+                    ]
                 ], 404);
             }
 
@@ -51,7 +75,8 @@ class DiskonController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }
@@ -60,15 +85,12 @@ class DiskonController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id_diskon' => 'required|string|max:20|unique:diskons,id_diskon',
                 'nama' => 'required|string|max:100',
                 'persen' => 'required|numeric|min:0|max:100',
                 'Berlaku_dari' => 'required|date',
                 'Berlaku_sampai' => 'required|date|after:Berlaku_dari',
                 'dibuat_oleh' => 'required|string|max:100'
             ], [
-                'id_diskon.required' => 'Kode diskon wajib diisi',
-                'id_diskon.unique' => 'Kode diskon sudah digunakan',
                 'nama.required' => 'Nama diskon wajib diisi',
                 'persen.required' => 'Persentase diskon wajib diisi',
                 'persen.min' => 'Persentase minimal 0',
@@ -88,7 +110,6 @@ class DiskonController extends Controller
             }
 
             $diskon = Diskon::create([
-                'id_diskon' => $request->id_diskon,
                 'nama' => $request->nama,
                 'persen' => $request->persen,
                 'Berlaku_dari' => Carbon::parse($request->Berlaku_dari),

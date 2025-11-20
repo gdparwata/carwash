@@ -69,11 +69,7 @@
                                 onclick="toggleEditMode()"
                                 class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
                             Edit Profile
-                        </button>
-                        <button type="button" 
-                                class="w-full bg-white border-2 border-blue-600 text-blue-600 font-bold py-3 px-6 rounded-xl hover:bg-blue-50 transition duration-300">
-                            Tema<br><small class="text-sm">Default</small>
-                        </button>
+                    </button>
                         <button type="button" 
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                 class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 flex items-center justify-center">

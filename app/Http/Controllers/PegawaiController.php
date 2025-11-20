@@ -71,16 +71,86 @@ class PegawaiController extends Controller
         ]);
     }
 
-    public function destroy($id)
-    {
+   public function destroy($id)
+{
+    try {
+        \DB::beginTransaction();
+        
         $pegawai = Pegawai::findOrFail($id);
+        
+        \Log::info("Attempting to delete pegawai ID: {$id}");
+        
+        // 1. Cari semua booking terkait pegawai ini
+        $bookingIds = \DB::table('bookings')
+            ->where('id_pegawai', $id)
+            ->pluck('id_booking')
+            ->toArray();
+        
+        \Log::info("Found bookings: " . json_encode($bookingIds));
+        
+        if (!empty($bookingIds)) {
+        
+            // Hapus invoices
+            $deleted = \DB::table('invoices')->whereIn('id_booking', $bookingIds)->delete();
+            \Log::info("Deleted invoices: {$deleted}");
+            
+            // Hapus payments jika ada
+            try {
+                $deleted = \DB::table('payments')->whereIn('id_booking', $bookingIds)->delete();
+                \Log::info("Deleted payments: {$deleted}");
+            } catch (\Exception $e) {
+                \Log::warning("No payments table or error: " . $e->getMessage());
+            }
+            
+            // Hapus tabel lain yang mungkin ada relasi dengan bookings
+            try {
+                $deleted = \DB::table('booking_services')->whereIn('id_booking', $bookingIds)->delete();
+                \Log::info("Deleted booking_services: {$deleted}");
+            } catch (\Exception $e) {
+                \Log::warning("No booking_services table: " . $e->getMessage());
+            }
+            
+            try {
+                $deleted = \DB::table('booking_addons')->whereIn('id_booking', $bookingIds)->delete();
+                \Log::info("Deleted booking_addons: {$deleted}");
+            } catch (\Exception $e) {
+                \Log::warning("No booking_addons table: " . $e->getMessage());
+            }
+            
+            // Baru hapus bookings
+            $deleted = \DB::table('bookings')->where('id_pegawai', $id)->delete();
+            \Log::info("Deleted bookings: {$deleted}");
+        }
+        
+        // 2. Hapus libur terkait
+        $deleted = \DB::table('liburs')->where('id_pegawai', $id)->delete();
+        \Log::info("Deleted liburs: {$deleted}");
+        
+        // 3. Terakhir hapus pegawai
         $pegawai->delete();
+        \Log::info("Deleted pegawai successfully");
+        
+        \DB::commit();
 
         return response()->json([
             'success' => true,
-            'message' => 'Pegawai berhasil dihapus'
+            'message' => 'Pegawai dan semua data terkait berhasil dihapus'
         ]);
+        
+    } catch (\Exception $e) {
+        \DB::rollBack();
+        \Log::error('Error deleting pegawai ID ' . $id . ': ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ], 500);
     }
+}
+
+
+
 
     // CRUD untuk Admin
     public function adminIndex()
@@ -144,17 +214,97 @@ class PegawaiController extends Controller
         ]);
     }
 
-    public function destroyAdmin($id)
-    {
+ 
+public function destroyAdmin($id)
+{
+    try {
+        \DB::beginTransaction();
+        
         $admin = User::findOrFail($id);
+        
+        // Cek apakah ini admin terakhir
+        $totalAdmins = User::where('role', 'admin')->count();
+        if ($totalAdmins <= 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat menghapus admin terakhir!'
+            ], 400);
+        }
+        
+        \Log::info("Attempting to delete admin ID: {$id}");
+        
+        // 1. Cari semua booking terkait admin ini
+        $bookingIds = \DB::table('bookings')
+            ->where('id_user', $id)
+            ->pluck('id_booking')
+            ->toArray();
+        
+        \Log::info("Found bookings: " . json_encode($bookingIds));
+        
+        if (!empty($bookingIds)) {
+            // Hapus detail_bookings jika ada
+  
+            // Hapus invoices
+            $deleted = \DB::table('invoices')->whereIn('id_booking', $bookingIds)->delete();
+            \Log::info("Deleted invoices: {$deleted}");
+            
+            // Hapus payments jika ada
+            try {
+                $deleted = \DB::table('payments')->whereIn('id_booking', $bookingIds)->delete();
+                \Log::info("Deleted payments: {$deleted}");
+            } catch (\Exception $e) {
+                \Log::warning("No payments table: " . $e->getMessage());
+            }
+            
+            // Hapus tabel lain yang mungkin ada
+
+            
+            try {
+                $deleted = \DB::table('booking_addons')->whereIn('id_booking', $bookingIds)->delete();
+                \Log::info("Deleted booking_addons: {$deleted}");
+            } catch (\Exception $e) {
+                \Log::warning("No booking_addons table: " . $e->getMessage());
+            }
+            
+            // Baru hapus bookings
+            $deleted = \DB::table('bookings')->where('id_user', $id)->delete();
+            \Log::info("Deleted bookings: {$deleted}");
+        }
+        
+        // 2. Hapus libur terkait
+        $deleted = \DB::table('liburs')->where('id_user', $id)->delete();
+        \Log::info("Deleted liburs: {$deleted}");
+        
+        // 3. Hapus blogs jika admin adalah author
+        try {
+            $deleted = \DB::table('blogs')->where('id_user', $id)->delete();
+            \Log::info("Deleted blogs: {$deleted}");
+        } catch (\Exception $e) {
+            \Log::warning("No blogs relation: " . $e->getMessage());
+        }
+        
+        // 4. Terakhir hapus admin
         $admin->delete();
+        \Log::info("Deleted admin successfully");
+        
+        \DB::commit();
 
         return response()->json([
             'success' => true,
-            'message' => 'Admin berhasil dihapus'
+            'message' => 'Admin dan semua data terkait berhasil dihapus'
         ]);
+        
+    } catch (\Exception $e) {
+        \DB::rollBack();
+        \Log::error('Error deleting admin ID ' . $id . ': ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ], 500);
     }
-
+}
     // *** TAMBAHAN CRUD UNTUK LIBUR ***
        // *** TAMBAHAN CRUD UNTUK LIBUR ***
     public function liburIndex()

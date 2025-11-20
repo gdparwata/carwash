@@ -21,6 +21,8 @@ class PaketController extends Controller
         return view('paket_harga.index', compact('pakets', 'tingkatans', 'jenisKendaraans', 'addons'));
     }
 
+    
+
     // GET - Tampilkan halaman ADMIN untuk manajemen paket
     public function index()
     {

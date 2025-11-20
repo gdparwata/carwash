@@ -19,19 +19,19 @@
             <div>
                 <label class="block font-semibold mb-1">Judul Artikel</label>
                 <input type="text" name="title" value="{{ old('title', $blog->title) }}"
-                       class="w-full border rounded-lg px-3 py-2 text-black" required>
+                       class="w-full border rounded-lg px-3 py-2 text-black bg-white" required>
             </div>
             <div>
                 <label class="block font-semibold mb-1">Penulis Artikel</label>
                 <input type="text" name="penulis" value="{{ $blog->user->name ?? auth()->user()->name }}" 
-                       class="w-full border rounded-lg px-3 py-2 text-black" readonly>
+                       class="w-full border rounded-lg px-3 py-2 text-black bg-white" readonly>
             </div>
         </div>
 
         {{-- Kategori --}}
         <div>
             <label class="block font-semibold mb-1">Kategori Artikel</label>
-            <select name="kategori" class="w-full border rounded-lg px-3 py-2 text-black">
+            <select name="kategori" class="w-full border rounded-lg px-3 py-2 text-black bg-white">
                 <option value="Tips" {{ $blog->kategori == 'Tips' ? 'selected' : '' }}>Tips & Trik</option>
                 <option value="Promo" {{ $blog->kategori == 'Promo' ? 'selected' : '' }}>Promo</option>
                 <option value="Berita" {{ $blog->kategori == 'Berita' ? 'selected' : '' }}>Berita</option>
@@ -42,14 +42,14 @@
         <div>
             <label class="block font-semibold mb-1">Ringkasan Artikel</label>
             <textarea name="deskripsi_singkat" rows="3" 
-                      class="w-full border rounded-lg px-3 py-2 text-black" required>{{ old('deskripsi_singkat', $blog->deskripsi_singkat) }}</textarea>
+                      class="w-full border rounded-lg px-3 py-2 text-black bg-white" required>{{ old('deskripsi_singkat', $blog->deskripsi_singkat) }}</textarea>
         </div>
 
         {{-- Konten --}}
         <div>
             <label class="block font-semibold mb-1">Konten Artikel</label>
             <textarea name="isi" rows="6" 
-                      class="w-full border rounded-lg px-3 py-2 text-black" required>{{ old('isi', $blog->isi) }}</textarea>
+                      class="w-full border rounded-lg px-3 py-2 text-black bg-white" required>{{ old('isi', $blog->isi) }}</textarea>
         </div>
 
         {{-- Upload Gambar --}}
@@ -72,7 +72,7 @@
             <label class="block font-semibold mb-1">Tags</label>
             <input type="text" name="tags" value="{{ old('tags', $blog->tags ?? '') }}"
                    placeholder="Contoh: cuci mobil, tips" 
-                   class="w-full border rounded-lg px-3 py-2 text-black">
+                   class="w-full border rounded-lg px-3 py-2 text-black bg-white">
         </div>
 
         {{-- Tombol --}}

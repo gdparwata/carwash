@@ -22,6 +22,8 @@ class TingkatanController extends Controller
         return view('admin.tingkatans.index', compact('tingkatans'));
     }
 
+    
+
     // GET - API untuk mendapatkan semua tingkatan (dipanggil dari JavaScript)
     public function getAll()
     {

@@ -92,7 +92,7 @@ class AuthController extends Controller
         return view('dashboard.owner', compact('user', 'stats'));
     }
 
-    // Admin dashboard
+    // Admin dashboard - FIXED VERSION
     public function adminDashboard()
     {
         if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'owner'])) {
@@ -101,14 +101,31 @@ class AuthController extends Controller
 
         $user = Auth::user();
         
+        // ✅ Ambil 5 user terbaru untuk dashboard
+        $users = User::where('role', 'user')
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        // ✅ Hitung statistik real
+        $totalUser = User::where('role', 'user')->count();
+        $activeUser = User::where('role', 'user')->count(); // Bisa disesuaikan dengan logic "active"
+        $newUser = User::where('role', 'user')
+            ->whereDate('created_at', \Carbon\Carbon::today())
+            ->count();
+        
+        // Check apakah total user lebih dari 5 (untuk tombol "Lihat Selengkapnya")
+        $hasMoreUsers = $totalUser > 5;
+        
         // Data untuk admin
         $data = [
-            'total_users' => User::where('role', 'user')->count(),
-            'total_orders' => 142, // dummy data
-            'pending_orders' => 8,  // dummy data
+            'total_users' => $totalUser,
+            'total_orders' => 142, // dummy data - bisa diganti dengan query real
+            'pending_orders' => 8,  // dummy data - bisa diganti dengan query real
         ];
 
-        return view('dashboard.admin', compact('user', 'data'));
+        // ✅ Kirim semua variabel ke view
+        return view('dashboard.admin', compact('user', 'data', 'users', 'totalUser', 'activeUser', 'newUser', 'hasMoreUsers'));
     }
 
     // User dashboard

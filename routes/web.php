@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
@@ -11,11 +12,16 @@ use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\JenisKendaraanController;
 use App\Http\Controllers\TingkatanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
-// Landing page
+// =========================
+// LANDING PAGE
+// =========================
 Route::get('/', [AuthController::class, 'welcome'])->name('welcome');
 
-// Auth routes
+// =========================
+// AUTH ROUTES
+// =========================
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -23,17 +29,64 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 // =========================
-// PUBLIC BLOG ROUTES (untuk user/guest)
+// PUBLIC BLOG ROUTES
 // =========================
-Route::get('/blog', [BlogController::class, 'publicIndex'])->name('blogs.index');
+Route::get('/blog', action: [BlogController::class, 'publicIndex'])->name('blogs.index');
 Route::get('/blog/{id_blog}', [BlogController::class, 'show'])->name('blogs.show');
 
-// Protected dashboard routes
+Route::get('/cucimobil', function () {
+    return view('viewpaket.cucimobil');
+})->name('cucimobil');
+
+Route::get('/paketbanjir', function () {
+    return view('viewpaket.paketbanjir');
+})->name('paketbanjir');
+
+Route::get('/salonmobil', function () {
+    return view('viewpaket.salonmobil');
+})->name('salonmobil');
+
+Route::get('/aboutus', function () {
+    return view('aboutus');
+})->name('aboutus');
+
+// =========================
+// PROTECTED DASHBOARD ROUTES
+// =========================
 Route::middleware('auth')->group(function () {
+
+    Route::get('/pakets', [PaketController::class, 'apiIndex']);
+    Route::get('/diskons', [DiskonController::class, 'apiIndex']);
+    Route::get('/tingkatans', [TingkatanController::class, 'apiIndex']);
+
+    // ============================================
+    // MAIN DASHBOARD ROUTE - REDIRECT BASED ON ROLE
+    // ============================================
+    Route::get('/dashboard', function() {
+        $user = auth()->user();
+        $periode = request('periode', 'bulan_ini');
+        
+        switch ($user->role) {
+            case 'owner':
+                return redirect()->route('owner.dashboard', ['periode' => $periode]);
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            case 'user':
+                return redirect()->route('dashboard.user');
+            default:
+                return redirect()->route('welcome');
+        }
+    })->name('dashboard');
+
+    // ============================================
+    // SPECIFIC ROLE DASHBOARDS
+    // ============================================
+    // Owner Dashboard - LANGSUNG DI SINI (Sebelum middleware owner)
+    Route::get('/dashboard/owner', [DashboardController::class, 'index'])
+        ->middleware('role:owner')
+        ->name('dashboard.owner');
     
-    // Dashboards
-    Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
-    Route::get('/dashboard/owner', [AuthController::class, 'ownerDashboard'])->name('dashboard.owner');
+    // Admin & User Dashboards
     Route::get('/dashboard/admin', [AuthController::class, 'adminDashboard'])->name('dashboard.admin');
     Route::get('/dashboard/user', [AuthController::class, 'userDashboard'])->name('dashboard.user');
 
@@ -47,42 +100,54 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
     // =========================
-    // USER Booking routes 
+    // USER BOOKING ROUTES
     // =========================
-    Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
-    Route::post('/bookings', [BookingController::class, 'storeUserBooking'])->name('bookings.store');
+   Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
+Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 
     // =========================
-    // ADMIN routes
+    // API ROUTES (Inside Auth Middleware)
     // =========================
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('api')->group(function () {
+        Route::get('/jenis-kendaraans', [JenisKendaraanController::class, 'getAll'])->name('api.jenis-kendaraans');
+        Route::get('/pakets', [PaketController::class, 'getAll'])->name('api.pakets');
+        Route::get('/pegawais', [PegawaiController::class, 'getAll'])->name('api.pegawais');
+        Route::get('/diskons', [DiskonController::class, 'getAll'])->name('api.diskons');
+        Route::get('/tingkatans', [TingkatanController::class, 'getAll'])->name('api.tingkatans');
+        
+        // API khusus untuk sistem pegawai
+        Route::get('/admins', [PegawaiController::class, 'getAdminData'])->name('api.admins');
+        Route::get('/statistik-data', [PegawaiController::class, 'getStatistikData'])->name('api.statistik');
+        Route::get('/pegawais-dropdown', [PegawaiController::class, 'getPegawaiDropdown'])->name('api.pegawais.dropdown');
+        Route::get('/admins-dropdown', [PegawaiController::class, 'getAdminDropdown'])->name('api.admins.dropdown');
+        
+        // API untuk available pegawai berdasarkan tanggal
+        Route::post('/available-pegawai', [BookingController::class, 'getAvailablePegawai'])->name('api.available-pegawai');
+    });
+
+    // =========================
+    // ADMIN AREA (Admin + Owner bisa akses)
+    // =========================
+    Route::middleware(['role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
+        
         // Dashboard Admin
         Route::get('/dashboard', [AuthController::class, 'adminDashboard'])->name('dashboard');
-        
+        Route::get('/dashboard-real', [AdminController::class, 'index'])->name('dashboard.real');
+
         // Profile Admin
         Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-        
-        // **BOOKING ROUTES**
+
+        // Booking Management
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
         Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
         Route::put('/bookings/{booking}', [BookingController::class, 'update'])->name('bookings.update');
         Route::delete('/bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
-        
-        // Booking specific actions
-        Route::get('/bookings/{booking}/details', [BookingController::class, 'getBookingDetails'])
-            ->name('bookings.details');
-        Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])
-            ->name('bookings.updateStatus');
-        Route::post('/bookings/{booking}/assign-pegawai', [BookingController::class, 'assignPegawai'])
-            ->name('bookings.assignPegawai');
-        Route::get('/bookings/{booking}/invoice', [BookingController::class, 'invoice'])
-            ->name('bookings.invoice');
-        Route::post('/bookings/{booking}/send-message', [BookingController::class, 'sendMessage'])
-            ->name('bookings.send-message');
-        
-        // Get unassigned bookings
-        Route::get('/bookings-unassigned', [BookingController::class, 'getUnassignedBookings'])
-            ->name('bookings.unassigned');
+        Route::get('/bookings/{booking}/details', [BookingController::class, 'getBookingDetails'])->name('bookings.details');
+        Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+        Route::post('/bookings/{booking}/assign-pegawai', [BookingController::class, 'assignPegawai'])->name('bookings.assignPegawai');
+        Route::get('/bookings/{booking}/invoice', [BookingController::class, 'invoice'])->name('bookings.invoice');
+        Route::post('/bookings/{booking}/send-message', [BookingController::class, 'sendMessage'])->name('bookings.send-message');
+        Route::get('/bookings-unassigned', [BookingController::class, 'getUnassignedBookings'])->name('bookings.unassigned');
 
         // User Management
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -90,7 +155,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
-        // Blog Management (ADMIN)
+        // User Management - Restore & Force Delete  
+        Route::get('/users/trashed', [UserController::class, 'trashed'])->name('users.trashed');
+        Route::post('/users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::delete('/users/{user}/force', [UserController::class, 'forceDelete'])->name('users.force-delete');
+
+        // Blog Management
         Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
         Route::get('/blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
         Route::post('/blogs', [BlogController::class, 'store'])->name('blogs.store');
@@ -111,30 +181,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/diskons/{diskon}', [DiskonController::class, 'destroy'])->name('diskons.destroy');
         Route::patch('/diskons/{diskon}/toggle-status', [DiskonController::class, 'toggleStatus'])->name('diskons.toggle-status');
 
-        // Pegawai Management
-        Route::get('/pegawais', [PegawaiController::class, 'index'])->name('pegawais.index');
-        Route::post('/pegawais', [PegawaiController::class, 'store'])->name('pegawais.store');
-        Route::get('/pegawais/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawais.edit');
-        Route::put('/pegawais/{id}', [PegawaiController::class, 'update'])->name('pegawais.update');
-        Route::delete('/pegawais/{id}', [PegawaiController::class, 'destroy'])->name('pegawais.destroy');
-        
-        // Admin User Management
-        Route::get('/admins', [PegawaiController::class, 'adminIndex'])->name('admins.index');
-        Route::post('/admins', [PegawaiController::class, 'storeAdmin'])->name('admins.store');
-        Route::get('/admins/{id}/edit', [PegawaiController::class, 'editAdmin'])->name('admins.edit');
-        Route::put('/admins/{id}', [PegawaiController::class, 'updateAdmin'])->name('admins.update');
-        Route::delete('/admins/{id}', [PegawaiController::class, 'destroyAdmin'])->name('admins.destroy');
-        
-        // Libur Management
-        Route::get('/liburs', [PegawaiController::class, 'liburIndex'])->name('liburs.index');
-        Route::post('/liburs', [PegawaiController::class, 'storeLibur'])->name('liburs.store');
-        Route::get('/liburs/{id}/edit', [PegawaiController::class, 'editLibur'])->name('liburs.edit');
-        Route::put('/liburs/{id}', [PegawaiController::class, 'updateLibur'])->name('liburs.update');
-        Route::delete('/liburs/{id}', [PegawaiController::class, 'destroyLibur'])->name('liburs.destroy');
-        
-        // Statistik route
-        Route::get('/statistik', [PegawaiController::class, 'statistik'])->name('statistik.index');
-
         // Jenis Kendaraan Management
         Route::get('/jenis-kendaraans', [JenisKendaraanController::class, 'index'])->name('jenis-kendaraans.index');
         Route::post('/jenis-kendaraans', [JenisKendaraanController::class, 'store'])->name('jenis-kendaraans.store');
@@ -148,241 +194,49 @@ Route::middleware('auth')->group(function () {
         Route::delete('/tingkatans/{tingkatan}', [TingkatanController::class, 'destroy'])->name('tingkatans.destroy');
     });
 
-    // Public routes untuk harga paket
-    Route::get('/harga/index', [PaketController::class, 'index'])->name('pakets.index.public');
-    // Public routes untuk harga paket (untuk user/guest)
+    // =========================
+    // OWNER EXCLUSIVE AREA (Hanya Owner)
+    // =========================
+    Route::middleware(['role:owner'])->prefix('owner')->name('owner.')->group(function () {
+
+        // ============================================
+        // DASHBOARD OWNER - DENGAN PERIODE SUPPORT
+        // ============================================
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/refresh', [DashboardController::class, 'refresh'])->name('dashboard.refresh');
+
+        // Pegawai Management
+        Route::get('/pegawais', [PegawaiController::class, 'index'])->name('pegawais.index');
+        Route::post('/pegawais', [PegawaiController::class, 'store'])->name('pegawais.store');
+        Route::get('/pegawais/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawais.edit');
+        Route::put('/pegawais/{id}', [PegawaiController::class, 'update'])->name('pegawais.update');
+        Route::delete('/pegawais/{id}', [PegawaiController::class, 'destroy'])->name('pegawais.destroy');
+
+        // Admin User Management
+        Route::get('/admins', [PegawaiController::class, 'adminIndex'])->name('admins.index');
+        Route::post('/admins', [PegawaiController::class, 'storeAdmin'])->name('admins.store');
+        Route::get('/admins/{id}/edit', [PegawaiController::class, 'editAdmin'])->name('admins.edit');
+        Route::put('/admins/{id}', [PegawaiController::class, 'updateAdmin'])->name('admins.update');
+        Route::delete('/admins/{id}', [PegawaiController::class, 'destroyAdmin'])->name('admins.destroy');
+
+        // Libur Management
+        Route::get('/liburs', [PegawaiController::class, 'liburIndex'])->name('liburs.index');
+        Route::post('/liburs', [PegawaiController::class, 'storeLibur'])->name('liburs.store');
+        Route::get('/liburs/{id}/edit', [PegawaiController::class, 'editLibur'])->name('liburs.edit');
+        Route::put('/liburs/{id}', [PegawaiController::class, 'updateLibur'])->name('liburs.update');
+        Route::delete('/liburs/{id}', [PegawaiController::class, 'destroyLibur'])->name('liburs.destroy');
+
+        // User Management (untuk delete user dari dashboard owner)
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        // Statistik
+        Route::get('/statistik', [PegawaiController::class, 'statistik'])->name('statistik.index');
+    });
+
+}); // <- Penutup middleware('auth')
+
+// =========================
+// PUBLIC AREA
+// =========================
+Route::get('/harga/index', [PaketController::class, 'index'])->name('pakets.index.public');
 Route::get('/paket_harga/index', [PaketController::class, 'publicIndex'])->name('paket.public');
-    // API Routes
-    Route::prefix('api')->group(function () {
-        Route::get('/jenis-kendaraans', [JenisKendaraanController::class, 'getAll'])->name('api.jenis-kendaraans');
-        Route::get('/pakets', [PaketController::class, 'getAll'])->name('api.pakets');
-        Route::get('/pegawais', [PegawaiController::class, 'getAll'])->name('api.pegawais');
-        Route::get('/diskons', [DiskonController::class, 'getAll'])->name('api.diskons');
-        Route::get('/tingkatans', [TingkatanController::class, 'getAll'])->name('api.tingkatans');
-        
-        // API khusus untuk sistem pegawai
-        Route::get('/admins', [PegawaiController::class, 'getAdminData'])->name('api.admins');
-        Route::get('/statistik-data', [PegawaiController::class, 'getStatistikData'])->name('api.statistik');
-        Route::get('/pegawais-dropdown', [PegawaiController::class, 'getPegawaiDropdown'])->name('api.pegawais.dropdown');
-        Route::get('/admins-dropdown', [PegawaiController::class, 'getAdminDropdown'])->name('api.admins.dropdown');
-        
-        // API untuk available pegawai berdasarkan tanggal
-        Route::post('/available-pegawai', [BookingController::class, 'getAvailablePegawai'])->name('api.available-pegawai');
-    });
-});
-
-// ===== ROUTE UNTUK TESTING/DEBUG (HAPUS SETELAH PRODUCTION) =====
-Route::get('/test-libur', function() {
-    $today = now();
-    $dayNumber = $today->dayOfWeek;
-    $hariIndonesia = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][$dayNumber];
-    
-    $allPegawai = \App\Models\Pegawai::all();
-    $allLibur = \App\Models\Libur::with('pegawai')->get();
-    $liburToday = \App\Models\Libur::where('hari', $hariIndonesia)
-        ->whereNotNull('id_pegawai')
-        ->with('pegawai')
-        ->get();
-    $availablePegawai = \App\Models\Pegawai::availableOnDay($hariIndonesia)->get();
-    
-    return response()->json([
-        'today' => $today->format('Y-m-d H:i:s'),
-        'day_number' => $dayNumber,
-        'hari_indonesia' => $hariIndonesia,
-        'total_pegawai' => $allPegawai->count(),
-        'all_pegawai' => $allPegawai->map(function($p) {
-            return [
-                'id' => $p->id_Pegawai,
-                'nama' => $p->nama,
-                'libur_days' => $p->liburs->pluck('hari')->toArray()
-            ];
-        }),
-        'all_libur_data' => $allLibur->map(function($l) {
-            return [
-                'id_libur' => $l->id_libur,
-                'id_pegawai' => $l->id_pegawai,
-                'pegawai_nama' => $l->pegawai ? $l->pegawai->nama : null,
-                'hari' => $l->hari
-            ];
-        }),
-        'pegawai_libur_today' => $liburToday->map(function($l) {
-            return [
-                'id' => $l->id_pegawai,
-                'nama' => $l->pegawai ? $l->pegawai->nama : 'Unknown'
-            ];
-        }),
-        'pegawai_tersedia_today' => $availablePegawai->map(function($p) {
-            return [
-                'id' => $p->id_Pegawai,
-                'nama' => $p->nama
-            ];
-        })
-    ]);
-})->name('test.libur');
-
-Route::get('/quick-test', function() {
-    $results = [];
-    
-    $allPegawai = \App\Models\Pegawai::all();
-    $results['total_pegawai'] = $allPegawai->count();
-    $results['pegawai_list'] = $allPegawai->pluck('nama', 'id_Pegawai');
-    
-    $allLibur = \App\Models\Libur::with('pegawai')->get();
-    $results['total_libur'] = $allLibur->count();
-    $results['libur_list'] = $allLibur->map(function($l) {
-        return [
-            'id_libur' => $l->id_libur,
-            'id_pegawai' => $l->id_pegawai,
-            'pegawai' => $l->pegawai ? $l->pegawai->nama : 'NULL (Broken FK!)',
-            'hari' => $l->hari
-        ];
-    });
-    
-    $firstPegawai = \App\Models\Pegawai::first();
-    if ($firstPegawai) {
-        $results['first_pegawai'] = [
-            'id' => $firstPegawai->id_Pegawai,
-            'nama' => $firstPegawai->nama,
-            'libur_count' => $firstPegawai->liburs->count(),
-            'libur_days' => $firstPegawai->liburs->pluck('hari')->toArray()
-        ];
-    }
-    
-    $today = now();
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][$today->dayOfWeek];
-    $availableToday = \App\Models\Pegawai::availableOnDay($hari)->get();
-    $results['today'] = [
-        'date' => $today->format('Y-m-d'),
-        'day_name' => $today->format('l'),
-        'hari_indonesia' => $hari,
-        'available_count' => $availableToday->count(),
-        'available_names' => $availableToday->pluck('nama')->toArray()
-    ];
-    
-    $brokenFK = \DB::select("
-        SELECT l.id_libur, l.id_pegawai, l.hari
-        FROM liburs l
-        LEFT JOIN pegawais p ON l.id_pegawai = p.id_Pegawai
-        WHERE l.id_pegawai IS NOT NULL AND p.id_Pegawai IS NULL
-    ");
-    $results['broken_fk'] = count($brokenFK) > 0 ? [
-        'count' => count($brokenFK),
-        'warning' => 'Ada data libur dengan FK broken! Perlu di-fix.',
-        'data' => $brokenFK
-    ] : 'OK - No broken FK';
-    
-    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
-})->name('test.quick');
-
-Route::get('/test-date/{date}', function($date) {
-    try {
-        $carbonDate = \Carbon\Carbon::parse($date);
-        $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][$carbonDate->dayOfWeek];
-        
-        $liburOnDate = \App\Models\Libur::where('hari', $hari)
-            ->whereNotNull('id_pegawai')
-            ->with('pegawai')
-            ->get();
-            
-        $availableOnDate = \App\Models\Pegawai::availableOnDay($hari)->get();
-        
-        return response()->json([
-            'date' => $carbonDate->format('Y-m-d'),
-            'day_name' => $carbonDate->format('l'),
-            'hari_indonesia' => $hari,
-            'pegawai_libur' => $liburOnDate->map(function($l) {
-                return [
-                    'id' => $l->id_pegawai,
-                    'nama' => $l->pegawai ? $l->pegawai->nama : 'Unknown'
-                ];
-            }),
-            'pegawai_tersedia' => $availableOnDate->map(function($p) {
-                return [
-                    'id' => $p->id_Pegawai,
-                    'nama' => $p->nama
-                ];
-            })
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage()
-        ], 400);
-    }
-})->name('test.date');
-
-Route::get('/test-invoice-now', function() {
-    try {
-        // Ambil booking terakhir
-        $booking = \App\Models\Booking::latest('id_booking')->first();
-        
-        if (!$booking) {
-            return 'Tidak ada booking';
-        }
-
-        // Test insert dengan created_at & updated_at
-        $result = DB::table('invoices')->insert([
-            'id_booking' => $booking->id_booking,
-            'tanggal' => now(),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // Cek hasilnya
-        $invoice = DB::table('invoices')
-            ->where('id_booking', $booking->id_booking)
-            ->first();
-
-        return response()->json([
-            'status' => $result ? 'INSERT SUCCESS' : 'INSERT FAILED',
-            'booking_id' => $booking->id_booking,
-            'invoice_found' => $invoice ? 'YES' : 'NO',
-            'invoice_data' => $invoice,
-            'total_invoices' => DB::table('invoices')->count()
-        ], 200, [], JSON_PRETTY_PRINT);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'code' => $e->getCode(),
-            'line' => $e->getLine()
-        ]);
-    }
-});
-Route::get('/test-invoice-now', function() {
-    try {
-        // Ambil booking terakhir
-        $booking = \App\Models\Booking::latest('id_booking')->first();
-        
-        if (!$booking) {
-            return 'Tidak ada booking';
-        }
-
-        // Test insert dengan created_at & updated_at
-        $result = DB::table('invoices')->insert([
-            'id_booking' => $booking->id_booking,
-            'tanggal' => now(),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // Cek hasilnya
-        $invoice = DB::table('invoices')
-            ->where('id_booking', $booking->id_booking)
-            ->first();
-
-        return response()->json([
-            'status' => $result ? 'INSERT SUCCESS' : 'INSERT FAILED',
-            'booking_id' => $booking->id_booking,
-            'invoice_found' => $invoice ? 'YES' : 'NO',
-            'invoice_data' => $invoice,
-            'total_invoices' => DB::table('invoices')->count()
-        ], 200, [], JSON_PRETTY_PRINT);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'code' => $e->getCode(),
-            'line' => $e->getLine()
-        ]);
-    }
-});

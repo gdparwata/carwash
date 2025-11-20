@@ -126,7 +126,7 @@
                                     @foreach($jenisPenanganans as $penanganan)
                                     <option value="{{ $penanganan->id_Tingkatan }}" 
                                         data-harga="{{ $penanganan->harga }}"
-                                        {{ old('id_jenis_penanganan') == $penanganan->id_Tingkatan ? 'selected' : '' }}>
+                                        {{ old('id_jenis_penanganan') == $penanganan->id_tingkatan ? 'selected' : '' }}>
                                         {{ $penanganan->Tingkatan }} (Rp {{ number_format($penanganan->harga, 0, ',', '.') }})
                                     </option>
                                     @endforeach

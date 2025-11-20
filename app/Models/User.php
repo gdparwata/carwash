@@ -3,24 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'users';
     protected $primaryKey = 'id_User';
 
     protected $fillable = [
         'name',
-        'nama_belakang',      // TAMBAH INI
+        'nama_belakang',
         'email',
         'password',
-        'no_telepon',         // TAMBAH INI
-        'alamat',             // TAMBAH INI
-        'foto_profile',       // TAMBAH INI
+        'no_telepon',
+        'alamat',
+        'foto_profile',
         'role',
     ];
 
@@ -34,27 +35,41 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Get jumlah mobil dicuci untuk admin (simulasi)
-    public function getJumlahMobilAttribute()
+    // 👇 TAMBAHKAN INI
+    /**
+     * Get nama lengkap (gabungan name + nama_belakang)
+     */
+    public function getNamaLengkapAttribute()
     {
-        // Simulasi performance berdasarkan ID atau random
-        return rand(50, 1000);
+        $fullName = trim($this->name . ' ' . $this->nama_belakang);
+        return $fullName ?: $this->name; // Fallback ke name jika kosong
     }
 
-    // Helper untuk mendapatkan URL foto profil
+    /**
+     * Get foto profile URL with fallback to UI Avatars
+     */
     public function getFotoProfileUrlAttribute()
     {
-        if ($this->foto_profile) {
+        if ($this->foto_profile && file_exists(public_path('storage/' . $this->foto_profile))) {
             return asset('storage/' . $this->foto_profile);
         }
         
-        // Default avatar jika tidak ada foto
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=200&background=667eea&color=fff';
+        // Fallback ke UI Avatars dengan nama lengkap
+        $name = $this->nama_lengkap ?: 'User';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=3B82F6&color=fff&size=200';
     }
 
-    // Helper untuk mendapatkan nama lengkap
-    public function getNamaLengkapAttribute()
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
     {
-        return $this->name . ($this->nama_belakang ? ' ' . $this->nama_belakang : '');
+        return 'id_User';
+    }
+
+    // Relasi bookings jika ada
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'id_User', 'id_User');
     }
 }

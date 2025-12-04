@@ -13,6 +13,8 @@ use App\Http\Controllers\JenisKendaraanController;
 use App\Http\Controllers\TingkatanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AddonsController;  
+use App\Http\Controllers\AboutUsController;
 
 // =========================
 // LANDING PAGE
@@ -102,8 +104,8 @@ Route::middleware('auth')->group(function () {
     // =========================
     // USER BOOKING ROUTES
     // =========================
-   Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
-Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+  Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
+Route::post('/bookings', [BookingController::class, 'storeUserBooking'])->name('bookings.store');
 
     // =========================
     // API ROUTES (Inside Auth Middleware)
@@ -114,6 +116,16 @@ Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.st
         Route::get('/pegawais', [PegawaiController::class, 'getAll'])->name('api.pegawais');
         Route::get('/diskons', [DiskonController::class, 'getAll'])->name('api.diskons');
         Route::get('/tingkatans', [TingkatanController::class, 'getAll'])->name('api.tingkatans');
+
+         Route::get('/addons', [AddonsController::class, 'index'])->name('api.addons.index');
+        Route::get('/addons/{id}', [AddonsController::class, 'show'])->name('api.addons.show');
+        Route::post('/addons', [AddonsController::class, 'store'])->name('api.addons.store');
+        Route::put('/addons/{id}', [AddonsController::class, 'update'])->name('api.addons.update');
+        Route::delete('/addons/{id}', [AddonsController::class, 'destroy'])->name('api.addons.destroy');
+
+         Route::post('/addons/{id}/attach-paket', [AddonsController::class, 'attachToPaket']);
+    Route::post('/addons/{id}/detach-paket', [AddonsController::class, 'detachFromPaket']);
+        
         
         // API khusus untuk sistem pegawai
         Route::get('/admins', [PegawaiController::class, 'getAdminData'])->name('api.admins');
@@ -148,6 +160,15 @@ Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.st
         Route::get('/bookings/{booking}/invoice', [BookingController::class, 'invoice'])->name('bookings.invoice');
         Route::post('/bookings/{booking}/send-message', [BookingController::class, 'sendMessage'])->name('bookings.send-message');
         Route::get('/bookings-unassigned', [BookingController::class, 'getUnassignedBookings'])->name('bookings.unassigned');
+        // Tambahkan di dalam grup admin
+
+        Route::get('/aboutus', [AboutUsController::class, 'index'])->name('aboutus.index');
+        Route::get('/aboutus/create', [AboutUsController::class, 'create'])->name('aboutus.create');
+        Route::post('/aboutus', [AboutUsController::class, 'store'])->name('aboutus.store');
+        Route::get('/aboutus/{id}/edit', [AboutUsController::class, 'edit'])->name('aboutus.edit');
+        Route::put('/aboutus/{id}', [AboutUsController::class, 'update'])->name('aboutus.update');
+        Route::delete('/aboutus/{id}', [AboutUsController::class, 'destroy'])->name('aboutus.destroy');
+       
 
         // User Management
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -192,7 +213,16 @@ Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.st
         Route::post('/tingkatans', [TingkatanController::class, 'store'])->name('tingkatans.store');
         Route::put('/tingkatans/{tingkatan}', [TingkatanController::class, 'update'])->name('tingkatans.update');
         Route::delete('/tingkatans/{tingkatan}', [TingkatanController::class, 'destroy'])->name('tingkatans.destroy');
+
+         // 🆕 Addons Management
+    Route::get('/addons', [\App\Http\Controllers\AddonsController::class, 'index'])->name('addons.index');
+    Route::post('/addons', [\App\Http\Controllers\AddonsController::class, 'store'])->name('addons.store');
+    Route::put('/addons/{id}', [\App\Http\Controllers\AddonsController::class, 'update'])->name('addons.update');
+    Route::delete('/addons/{id}', [\App\Http\Controllers\AddonsController::class, 'destroy'])->name('addons.destroy');
     });
+      Route::post('/api/available-pegawai', [BookingController::class, 'getAvailablePegawai']);
+    Route::post('/api/tingkatan-by-paket', [BookingController::class, 'getTingkatanByPaket']);
+        Route::post('api/addons-by-paket', [BookingController::class, 'getAddonsByPaket']); // ← TAMBAH INI
 
     // =========================
     // OWNER EXCLUSIVE AREA (Hanya Owner)
@@ -240,3 +270,4 @@ Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.st
 // =========================
 Route::get('/harga/index', [PaketController::class, 'index'])->name('pakets.index.public');
 Route::get('/paket_harga/index', [PaketController::class, 'publicIndex'])->name('paket.public');
+Route::get('/aboutus', [AboutUsController::class, 'show'])->name('aboutus');

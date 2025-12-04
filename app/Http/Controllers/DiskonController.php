@@ -9,17 +9,39 @@ use Carbon\Carbon;
 
 class DiskonController extends Controller
 {
-    public function index()
-    {
+   public function index()
+{
+    try {
         $diskons = Diskon::orderBy('created_at', 'desc')->get();
         
-        if (request()->wantsJson() || request()->is('api/*')) {
+        // Transform data untuk JavaScript compatibility
+        $diskons = $diskons->map(function($diskon) {
+            return [
+                'id_Diskon' => $diskon->id_Diskon,
+                'id_diskon' => $diskon->id_Diskon, // Duplicate untuk JS compatibility
+                'nama' => $diskon->nama,
+                'persen' => $diskon->persen,
+                'Berlaku_dari' => $diskon->Berlaku_dari,
+                'Berlaku_sampai' => $diskon->Berlaku_sampai,
+                'dibuat_oleh' => $diskon->dibuat_oleh,
+                'created_at' => $diskon->created_at,
+                'updated_at' => $diskon->updated_at,
+            ];
+        });
+        
+        if (request()->wantsJson() || request()->is('api/*') || request()->is('admin/*')) {
             return response()->json($diskons, 200);
         }
         
         return view('admin.diskons.index', compact('diskons'));
+    } catch (\Exception $e) {
+        \Log::error('Error loading diskons: ' . $e->getMessage());
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error: ' . $e->getMessage()
+        ], 500);
     }
-
+}
     public function getAll()
     {
         try {

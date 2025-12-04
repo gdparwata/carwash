@@ -32,7 +32,7 @@ class Booking extends Model
         'id_user',
         'id_Pegawai',
         'id_jenis_kendaraan',
-        'id_addons',
+        'id_Addons',
         'id_Diskon',
         'id_jenis_penanganan', // 👈 TAMBAHKAN INI (foreign key ke tingkatans)
     ];
@@ -80,7 +80,7 @@ class Booking extends Model
 
     public function addons()
     {
-        return $this->belongsTo(Addons::class, 'id_addons', 'id_addons');
+        return $this->belongsTo(Addons::class, 'id_Addons', 'id_addons');
     }
 
     public function diskon()

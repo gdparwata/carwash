@@ -118,33 +118,14 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="id_jenis_penanganan" class="block text-sm font-medium text-gray-600 mb-1">Jenis Penanganan</label>
-                                <select id="id_jenis_penanganan" name="id_jenis_penanganan" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('id_jenis_penanganan') border-red-500 @enderror" 
-                                    required>
-                                    <option value="">Pilih Jenis Penanganan</option>
-                                    @foreach($jenisPenanganans as $penanganan)
-                                    <option value="{{ $penanganan->id_Tingkatan }}" 
-                                        data-harga="{{ $penanganan->harga }}"
-                                        {{ old('id_jenis_penanganan') == $penanganan->id_tingkatan ? 'selected' : '' }}>
-                                        {{ $penanganan->Tingkatan }} (Rp {{ number_format($penanganan->harga, 0, ',', '.') }})
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @error('id_jenis_penanganan')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
                                 <label for="id_Paket" class="block text-sm font-medium text-gray-600 mb-1">Paket Penanganan</label>
                                 <select id="id_Paket" name="id_Paket" 
+                                    onchange="loadPaketPenanganan()"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('id_Paket') border-red-500 @enderror" 
                                     required>
                                     <option value="">Pilih Paket</option>
                                     @foreach($pakets as $paket)
                                     <option value="{{ $paket->id_Paket }}" 
-                                        data-tingkatan="{{ $paket->id_Tingkatan }}"
                                         {{ old('id_Paket') == $paket->id_Paket ? 'selected' : '' }}>
                                         {{ $paket->kategori_paket }}
                                     </option>
@@ -154,21 +135,29 @@
                                 <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            <div>
+                                <label for="id_jenis_penanganan" class="block text-sm font-medium text-gray-600 mb-1">Jenis Penanganan</label>
+                                <select id="id_jenis_penanganan" name="id_jenis_penanganan" 
+                                    onchange="calculateTotal()"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('id_jenis_penanganan') border-red-500 @enderror" 
+                                    required>
+                                    <option value="">Pilih paket dulu</option>
+                                </select>
+                                @error('id_jenis_penanganan')
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="mt-4">
-                            <label for="id_Addons" class="block text-sm font-medium text-gray-600 mb-1">Tambahan (Opsional)</label>
+                            <label for="id_Addons" class="block text-sm font-medium text-gray-600 mb-1">Tambahan Layanan (Addons)</label>
                             <select id="id_Addons" name="id_Addons" 
+                                onchange="calculateTotal()"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Tanpa Addons</option>
-                                @foreach($addons as $addon)
-                                <option value="{{ $addon->id_addons }}" 
-                                    data-harga="{{ $addon->harga }}"
-                                    {{ old('id_Addons') == $addon->id_addons ? 'selected' : '' }}>
-                                    {{ $addon->nama }} (Rp {{ number_format($addon->harga, 0, ',', '.') }})
-                                </option>
-                                @endforeach
+                                <option value="">Pilih paket dulu</option>
                             </select>
+                            <p class="text-xs text-gray-500 mt-1">Opsional - Pilih salah satu atau biarkan kosong</p>
                         </div>
                     </div>
 
@@ -199,9 +188,6 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('catatan') }}</textarea>
                         </div>
                     </div>
-
-                    <!-- Hidden fields -->
-                    <input type="hidden" name="metode" value="cash">
 
                     <!-- Total & Submit -->
                     <div class="bg-white rounded-lg shadow-md p-6">
@@ -290,9 +276,6 @@
     </div>
 </div>
 
-
-<!-- Letakkan sebelum section setelah closing </div> terakhir -->
-
 <script>
 (function() {
     'use strict';
@@ -324,70 +307,6 @@
             return;
         }
         
-        // Calculate total function
-        function calculateTotal() {
-            let total = 0;
-            console.log('=== Calculating Total ===');
-            
-            // Vehicle price
-            if (jenisKendaraanSelect && jenisKendaraanSelect.value) {
-                const opt = jenisKendaraanSelect.options[jenisKendaraanSelect.selectedIndex];
-                const price = parseFloat(opt.getAttribute('data-harga')) || 0;
-                console.log('Vehicle:', opt.text, '- Price:', price);
-                total += price;
-            }
-            
-            // Handling price
-            if (jenisPenangananSelect && jenisPenangananSelect.value) {
-                const opt = jenisPenangananSelect.options[jenisPenangananSelect.selectedIndex];
-                const price = parseFloat(opt.getAttribute('data-harga')) || 0;
-                console.log('Penanganan:', opt.text, '- Price:', price);
-                total += price;
-            }
-            
-            // Addons price
-            if (addonsSelect && addonsSelect.value) {
-                const opt = addonsSelect.options[addonsSelect.selectedIndex];
-                const price = parseFloat(opt.getAttribute('data-harga')) || 0;
-                console.log('Addons:', opt.text, '- Price:', price);
-                total += price;
-            }
-            
-            console.log('TOTAL:', total);
-            
-            // Update display
-            totalPriceEl.textContent = 'Rp. ' + total.toLocaleString('id-ID');
-            console.log('Display updated to:', totalPriceEl.textContent);
-        }
-        
-        // Filter paket function
-        function filterPaket() {
-            if (!paketSelect || !jenisPenangananSelect) return;
-            
-            const selectedTingkatan = jenisPenangananSelect.value;
-            const paketOptions = paketSelect.querySelectorAll('option');
-            
-            paketOptions.forEach(option => {
-                if (option.value === '') {
-                    option.style.display = 'block';
-                    return;
-                }
-                
-                if (option.getAttribute('data-tingkatan') === selectedTingkatan) {
-                    option.style.display = 'block';
-                } else {
-                    option.style.display = 'none';
-                }
-            });
-            
-            // Reset if invalid
-            const currentPaket = paketSelect.options[paketSelect.selectedIndex];
-            if (currentPaket && currentPaket.value !== '' && 
-                currentPaket.getAttribute('data-tingkatan') !== selectedTingkatan) {
-                paketSelect.value = '';
-            }
-        }
-        
         // Add event listeners
         if (jenisKendaraanSelect) {
             jenisKendaraanSelect.addEventListener('change', function() {
@@ -399,7 +318,6 @@
         if (jenisPenangananSelect) {
             jenisPenangananSelect.addEventListener('change', function() {
                 console.log('Penanganan changed');
-                filterPaket();
                 calculateTotal();
             });
         }
@@ -425,14 +343,199 @@
     });
 })();
 
-// Modal functions
+// ==================== LOAD TINGKATAN & ADDONS BY PAKET ====================
+function loadPaketPenanganan() {
+    const paketId = document.getElementById('id_Paket').value;
+    const tingkatanSelect = document.getElementById('id_jenis_penanganan');
+    const addonsSelect = document.getElementById('id_Addons');
+    
+    // Reset selects
+    tingkatanSelect.innerHTML = '<option value="">Loading...</option>';
+    addonsSelect.innerHTML = '<option value="">Loading...</option>';
+    
+    if (!paketId) {
+        tingkatanSelect.innerHTML = '<option value="">Pilih jenis penanganan dulu</option>';
+        addonsSelect.innerHTML = '<option value="">Pilih paket dulu</option>';
+        calculateTotal();
+        return;
+    }
+    
+    console.log('=== LOAD DATA BY PAKET ===');
+    console.log('Paket ID:', paketId);
+    
+    // ========== LOAD TINGKATAN ==========
+    fetch('/api/tingkatan-by-paket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ id_paket: paketId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Tingkatan response:', data);
+        
+        if (data.success) {
+            tingkatanSelect.innerHTML = '<option value="">Pilih Paket Penanganan</option>';
+            
+            if (data.data.length === 0) {
+                tingkatanSelect.innerHTML = '<option value="">Tidak ada paket tersedia</option>';
+            } else {
+                data.data.forEach((tingkatan) => {
+                    const option = document.createElement('option');
+                    option.value = tingkatan.id_Tingkatan;
+                    option.textContent = `${tingkatan.Tingkatan} - Rp ${new Intl.NumberFormat('id-ID').format(tingkatan.harga)}`;
+                    option.dataset.harga = tingkatan.harga;
+                    tingkatanSelect.appendChild(option);
+                });
+            }
+        } else {
+            tingkatanSelect.innerHTML = '<option value="">Error loading data</option>';
+            alert(data.message || 'Gagal memuat tingkatan');
+        }
+        calculateTotal();
+    })
+    .catch(error => {
+        console.error('Error loading tingkatan:', error);
+        tingkatanSelect.innerHTML = '<option value="">Error</option>';
+        alert('Terjadi kesalahan: ' + error.message);
+    });
+    
+    // ========== LOAD ADDONS BY PAKET ==========
+    fetch('/api/addons-by-paket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ id_paket: paketId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Addons response:', data);
+        
+        if (data.success) {
+            addonsSelect.innerHTML = '<option value="">-- Tidak Ada --</option>';
+            
+            if (data.data.length > 0) {
+                data.data.forEach((addon) => {
+                    const option = document.createElement('option');
+                    option.value = addon.id_addons;
+                    option.textContent = `${addon.nama} (+Rp ${new Intl.NumberFormat('id-ID').format(addon.harga)})`;
+                    option.dataset.harga = addon.harga;
+                    addonsSelect.appendChild(option);
+                });
+            }
+        } else {
+            addonsSelect.innerHTML = '<option value="">-- Tidak Ada --</option>';
+        }
+        calculateTotal();
+    })
+    .catch(error => {
+        console.error('Error loading addons:', error);
+        addonsSelect.innerHTML = '<option value="">-- Tidak Ada --</option>';
+    });
+}
+
+// Calculate total function
+function calculateTotal() {
+    let total = 0;
+    console.log('=== Calculating Total ===');
+    
+    const jenisKendaraanSelect = document.getElementById('id_jenis_kendaraan');
+    const jenisPenangananSelect = document.getElementById('id_jenis_penanganan');
+    const addonsSelect = document.getElementById('id_Addons');
+    const totalPriceEl = document.getElementById('totalPrice');
+    
+    // Vehicle price
+    if (jenisKendaraanSelect && jenisKendaraanSelect.value) {
+        const opt = jenisKendaraanSelect.options[jenisKendaraanSelect.selectedIndex];
+        const price = parseFloat(opt.getAttribute('data-harga')) || 0;
+        console.log('Vehicle:', opt.text, '- Price:', price);
+        total += price;
+    }
+    
+    // Penanganan price (from tingkatan)
+    if (jenisPenangananSelect && jenisPenangananSelect.value) {
+        const opt = jenisPenangananSelect.options[jenisPenangananSelect.selectedIndex];
+        const price = parseFloat(opt.getAttribute('data-harga')) || 0;
+        console.log('Penanganan:', opt.text, '- Price:', price);
+        total += price;
+    }
+    
+    // Addons price
+    if (addonsSelect && addonsSelect.value) {
+        const opt = addonsSelect.options[addonsSelect.selectedIndex];
+        const price = parseFloat(opt.getAttribute('data-harga')) || 0;
+        console.log('Addons:', opt.text, '- Price:', price);
+        total += price;
+    }
+    
+    console.log('TOTAL:', total);
+    
+    // Update display
+    if (totalPriceEl) {
+        totalPriceEl.textContent = 'Rp. ' + total.toLocaleString('id-ID');
+        console.log('Display updated to:', totalPriceEl.textContent);
+    }
+}
+
+// Form submission handler
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Mengirim...';
+    
+    fetch(this.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        
+        if (data.success) {
+            alert(data.message);
+            window.location.href = '/dashboard';
+        } else if (data.errors) {
+            let errorMsg = 'Validasi gagal:\n';
+            for (let field in data.errors) {
+                errorMsg += `- ${data.errors[field].join(', ')}\n`;
+            }
+            alert(errorMsg);
+        } else {
+            alert('Error: ' + (data.message || 'Terjadi kesalahan'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        alert('Terjadi kesalahan saat mengirim booking');
+    });
+});
+
+// Modal functions - keep for legacy support
 function showSuccessModal() {
     document.getElementById('successModal').classList.remove('hidden');
 }
 
 function closeModal() {
     document.getElementById('successModal').classList.add('hidden');
-    window.location.href = '/';
+    window.location.href = '/dashboard';
 }
 </script>
 @endsection

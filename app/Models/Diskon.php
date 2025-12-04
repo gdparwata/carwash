@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Diskon extends Model
 {
-    protected $table = 'diskons'; // atau 'id_Diskon' jika nama tabelnya
-    protected $primaryKey = 'id_Diskon'; // PENTING: Primary key yang benar
+    protected $table = 'diskons';
+    protected $primaryKey = 'id_Diskon'; // Primary key asli
     public $incrementing = true;
     protected $keyType = 'int';
 
@@ -20,10 +21,18 @@ class Diskon extends Model
     ];
 
     protected $casts = [
-        'Berlaku_dari' => 'date',
-        'Berlaku_sampai' => 'date',
+        'Berlaku_dari' => 'datetime',
+        'Berlaku_sampai' => 'datetime',
         'persen' => 'decimal:2',
     ];
+
+    // 🆕 TAMBAHKAN INI - Accessor untuk compatibility
+    protected $appends = ['id_diskon'];
+
+    public function getIdDiskonAttribute()
+    {
+        return $this->attributes['id_Diskon'];
+    }
 
     /**
      * Get the route key for the model.
@@ -37,22 +46,5 @@ class Diskon extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class, 'id_Diskon', 'id_Diskon');
-    }
-
-    public function getNilaiFormatAttribute()
-    {
-        if ($this->tipe === 'persentase') {
-            return $this->nilai . '%';
-        }
-        return 'Rp ' . number_format($this->nilai, 0, ',', '.');
-    }
-
-    public function getStatusAktifAttribute()
-    {
-        $now = Carbon::now()->toDateString();
-        return $this->status && 
-               $this->tanggal_mulai <= $now && 
-               $this->tanggal_selesai >= $now &&
-               ($this->kuota === null || $this->terpakai < $this->kuota);
     }
 }

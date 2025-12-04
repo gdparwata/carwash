@@ -67,7 +67,14 @@
                 <i class="fas fa-newspaper w-5"></i>
                 <span>Artikel</span>
             </a>
-            
+
+           <a href="{{ route('admin.aboutus.index') }}" 
+    class="flex items-center space-x-3 text-gray-700 hover:bg-white hover:bg-opacity-20 p-3 rounded-lg transition duration-200 
+    {{ request()->is('admin/aboutus*') ? 'bg-white bg-opacity-25' : '' }}">
+    <i class="fas fa-info-circle w-5"></i>
+    <span>About Us</span>
+</a>
+
             <a href="{{ route('admin.profile.show') }}" 
                 class="flex items-center space-x-3 text-gray-700 hover:bg-white hover:bg-opacity-20 p-3 rounded-lg transition duration-200 
                 {{ request()->is('admin/profile*') ? 'bg-white bg-opacity-25' : '' }}">
@@ -162,6 +169,13 @@
                     {{ request()->is('admin/blogs*') ? 'bg-white bg-opacity-25' : '' }}">
                     <i class="fas fa-newspaper w-5"></i>
                     <span>Artikel</span>
+
+                <a href="{{ route('admin.aboutus.index') }}" 
+                        class="flex items-center space-x-3 text-gray-700 hover:bg-white hover:bg-opacity-20 p-3 rounded-lg transition duration-200 
+                        {{ request()->is('admin/aboutus*') ? 'bg-white bg-opacity-25' : '' }}">
+                        <i class="fas fa-info-circle w-5"></i>
+                        <span>About Us</span>
+                </a>
                 </a>
                 <a href="{{ route('admin.profile.show') }}" 
                     class="flex items-center space-x-3 text-gray-700 hover:bg-white hover:bg-opacity-20 p-3 rounded-lg transition duration-200

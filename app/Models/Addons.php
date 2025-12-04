@@ -1,28 +1,30 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Addons extends Model
 {
-    use HasFactory;
-    
     protected $table = 'addons';
     protected $primaryKey = 'id_addons';
-    
-    protected $fillable = [
-        'nama',
-        'harga'
-    ];
-    
-    protected $casts = [
-        'harga' => 'decimal:2'
-    ];
-    
+    public $timestamps = true;
+
+    protected $fillable = ['nama', 'harga'];
+
+    // ✅ RELASI BALIK KE PAKET
+   public function pakets()
+{
+    return $this->belongsToMany(
+        Paket::class,  // ✅ Ganti dari Pakets ke Paket
+        'paket_addons',
+        'id_addons',
+        'id_paket'
+    );
+}
+
     public function bookings()
     {
-        // PERBAIKAN: gunakan id_addons, bukan id_Addons
-        return $this->hasMany(Booking::class, 'id_addons', 'id_addons');
+        return $this->hasMany(Booking::class, 'id_Addons', 'id_addons');
     }
 }

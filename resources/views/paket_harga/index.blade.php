@@ -32,175 +32,223 @@
         <!-- Content Sections -->
         
         <!-- Cuci Mobil Section -->
-        <div id="content-cuci-mobil" class="tab-content">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Paket Cuci</h2>
-            
-            <!-- Paket Cuci Grid -->
-            <div class="paket-container mb-8" data-section="paket-cuci" data-items-per-page="6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
-                    @forelse($pakets->filter(fn($p) => stripos($p->kategori_paket, 'cuci') !== false) as $paket)
-                    <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
-                        <div class="flex items-center gap-2 mb-3">
-                            @if($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'basic'))
-                            <span class="text-xl sm:text-2xl">⭐</span>
-                            @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'standard'))
-                            <span class="text-xl sm:text-2xl">⭐⭐</span>
-                            @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'elite'))
-                            <span class="text-xl sm:text-2xl">⭐⭐⭐</span>
-                            @else
-                            <span class="text-xl sm:text-2xl">⭐⭐⭐⭐</span>
-                            @endif
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $paket->tingkatan ? $paket->tingkatan->Tingkatan : 'Paket' }}</h3>
-                        </div>
-                        
-                        <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{{ $paket->kategori_paket }}</p>
-                        
-                        @if($paket->tingkatan)
-                        <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 space-y-1">
-                            {!! nl2br(e($paket->tingkatan->deskripsi)) !!}
-                        </div>
-                        @endif
-                        
-                        <div class="border-t pt-3 sm:pt-4">
-                            <p class="text-xs text-gray-500 mb-1">Harga</p>
-                            <p class="text-xl sm:text-2xl font-bold text-red-500">
-                                {{ $paket->tingkatan ? 'Rp. ' . number_format($paket->tingkatan->harga, 0, ',', '.') : 'Hubungi Kami' }}
-                            </p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        <p>Tidak ada paket cuci tersedia saat ini</p>
-                    </div>
-                    @endforelse
+<div id="content-cuci-mobil" class="tab-content">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Paket Cuci</h2>
+    
+    <!-- Paket Cuci Grid -->
+    <div class="paket-container mb-8" data-section="paket-cuci" data-items-per-page="6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
+            @forelse($pakets->filter(fn($p) => stripos($p->kategori_paket, 'cuci') !== false) as $paket)
+            <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center gap-2 mb-3">
+                    @if($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'basic'))
+                    <span class="text-xl sm:text-2xl">⭐</span>
+                    @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'standard'))
+                    <span class="text-xl sm:text-2xl">⭐⭐</span>
+                    @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'elite'))
+                    <span class="text-xl sm:text-2xl">⭐⭐⭐</span>
+                    @else
+                    <span class="text-xl sm:text-2xl">⭐⭐⭐⭐</span>
+                    @endif
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $paket->tingkatan ? $paket->tingkatan->Tingkatan : 'Paket' }}</h3>
                 </div>
                 
-                <!-- Pagination for Paket Cuci -->
-                <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
-            </div>
-
-            <!-- Add Ons Section -->
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8 mt-8 sm:mt-12">Add Ons</h2>
-            
-            <!-- Add Ons Grid -->
-            <div class="paket-container" data-section="addons" data-items-per-page="6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
-                    @forelse($addons ?? [] as $addon)
-                    <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="text-xl sm:text-2xl">✨</span>
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $addon->nama }}</h3>
-                        </div>
-                        
-                        <div class="border-t pt-3 sm:pt-4">
-                            <p class="text-xs text-gray-500 mb-1">Harga</p>
-                            <p class="text-xl sm:text-2xl font-bold text-red-500">Rp. {{ number_format($addon->harga, 0, ',', '.') }}</p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        <p>Tidak ada add-ons tersedia saat ini</p>
-                    </div>
-                    @endforelse
-                </div>
+                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{{ $paket->kategori_paket }}</p>
                 
-                <!-- Pagination for Add Ons -->
-                <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+                @if($paket->tingkatan)
+                <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 space-y-1">
+                    {!! nl2br(e($paket->tingkatan->deskripsi)) !!}
+                </div>
+                @endif
+                
+                <div class="border-t pt-3 sm:pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Harga</p>
+                    <p class="text-xl sm:text-2xl font-bold text-red-500">
+                        {{ $paket->tingkatan ? 'Rp. ' . number_format($paket->tingkatan->harga, 0, ',', '.') : 'Hubungi Kami' }}
+                    </p>
+                </div>
             </div>
+            @empty
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <p>Tidak ada paket cuci tersedia saat ini</p>
+            </div>
+            @endforelse
         </div>
+        
+        <!-- Pagination for Paket Cuci -->
+        <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+    </div>
 
-        <!-- Paket Banjir Section -->
-        <div id="content-paket-banjir" class="tab-content hidden">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Paket Banjir</h2>
-            
-            <div class="paket-container" data-section="paket-banjir" data-items-per-page="6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
-                    @forelse($pakets->filter(fn($p) => stripos($p->kategori_paket, 'banjir') !== false) as $paket)
-                    <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
-                        <div class="flex items-center gap-2 mb-3">
-                            @if($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'ringan'))
-                            <span class="text-xl sm:text-2xl">⭐</span>
-                            @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'sedang'))
-                            <span class="text-xl sm:text-2xl">⭐⭐</span>
-                            @else
-                            <span class="text-xl sm:text-2xl">⭐⭐⭐</span>
-                            @endif
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $paket->tingkatan ? $paket->tingkatan->Tingkatan : 'Paket Banjir' }}</h3>
-                        </div>
-                        
-                        <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{{ $paket->kategori_paket }}</p>
-                        
-                        @if($paket->tingkatan)
-                        <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 space-y-1">
-                            {!! nl2br(e($paket->tingkatan->deskripsi)) !!}
-                        </div>
-                        @endif
-                        
-                        <div class="border-t pt-3 sm:pt-4">
-                            <p class="text-xs text-gray-500 mb-1">Harga</p>
-                            <p class="text-xl sm:text-2xl font-bold text-red-500">
-                                {{ $paket->tingkatan ? 'Rp. ' . number_format($paket->tingkatan->harga, 0, ',', '.') : 'Hubungi Kami' }}
-                            </p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        <p>Tidak ada paket banjir tersedia saat ini</p>
-                    </div>
-                    @endforelse
+    <!-- Add Ons Section untuk Cuci Mobil -->
+    @if($addonsCuci->count() > 0)
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8 mt-8 sm:mt-12">Add Ons Cuci Mobil</h2>
+    
+    <div class="paket-container" data-section="addons-cuci" data-items-per-page="6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
+            @foreach($addonsCuci as $addon)
+            <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-xl sm:text-2xl">✨</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $addon->nama }}</h3>
                 </div>
                 
-                <!-- Pagination -->
-                <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+                <div class="border-t pt-3 sm:pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Harga Tambahan</p>
+                    <p class="text-xl sm:text-2xl font-bold text-red-500">Rp. {{ number_format($addon->harga, 0, ',', '.') }}</p>
+                </div>
             </div>
+            @endforeach
         </div>
+        
+        <!-- Pagination for Add Ons Cuci -->
+        <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+    </div>
+    @endif
+</div>
 
-        <!-- Salon Mobil Section -->
-        <div id="content-salon-mobil" class="tab-content hidden">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Salon Mobil</h2>
-            
-            <div class="paket-container" data-section="salon-mobil" data-items-per-page="6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
-                    @forelse($pakets->filter(fn($p) => stripos($p->kategori_paket, 'salon') !== false) as $paket)
-                    <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
-                        <div class="flex items-center gap-2 mb-3">
-                            @if($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'refresh'))
-                            <span class="text-xl sm:text-2xl">⭐</span>
-                            @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'shine'))
-                            <span class="text-xl sm:text-2xl">⭐⭐</span>
-                            @else
-                            <span class="text-xl sm:text-2xl">⭐⭐⭐</span>
-                            @endif
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $paket->tingkatan ? $paket->tingkatan->Tingkatan : 'Salon' }}</h3>
-                        </div>
-                        
-                        <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{{ $paket->kategori_paket }}</p>
-                        
-                        @if($paket->tingkatan)
-                        <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 space-y-1">
-                            {!! nl2br(e($paket->tingkatan->deskripsi)) !!}
-                        </div>
-                        @endif
-                        
-                        <div class="border-t pt-3 sm:pt-4">
-                            <p class="text-xs text-gray-500 mb-1">Harga</p>
-                            <p class="text-xl sm:text-2xl font-bold text-red-500">
-                                {{ $paket->tingkatan ? 'Rp. ' . number_format($paket->tingkatan->harga, 0, ',', '.') : 'Hubungi Kami' }}
-                            </p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        <p>Tidak ada paket salon tersedia saat ini</p>
-                    </div>
-                    @endforelse
+<!-- Paket Banjir Section -->
+<div id="content-paket-banjir" class="tab-content hidden">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Paket Banjir</h2>
+    
+    <div class="paket-container mb-8" data-section="paket-banjir" data-items-per-page="6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
+            @forelse($pakets->filter(fn($p) => stripos($p->kategori_paket, 'banjir') !== false) as $paket)
+            <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center gap-2 mb-3">
+                    @if($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'ringan'))
+                    <span class="text-xl sm:text-2xl">⭐</span>
+                    @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'sedang'))
+                    <span class="text-xl sm:text-2xl">⭐⭐</span>
+                    @else
+                    <span class="text-xl sm:text-2xl">⭐⭐⭐</span>
+                    @endif
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $paket->tingkatan ? $paket->tingkatan->Tingkatan : 'Paket Banjir' }}</h3>
                 </div>
                 
-                <!-- Pagination -->
-                <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{{ $paket->kategori_paket }}</p>
+                
+                @if($paket->tingkatan)
+                <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 space-y-1">
+                    {!! nl2br(e($paket->tingkatan->deskripsi)) !!}
+                </div>
+                @endif
+                
+                <div class="border-t pt-3 sm:pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Harga</p>
+                    <p class="text-xl sm:text-2xl font-bold text-red-500">
+                        {{ $paket->tingkatan ? 'Rp. ' . number_format($paket->tingkatan->harga, 0, ',', '.') : 'Hubungi Kami' }}
+                    </p>
+                </div>
             </div>
+            @empty
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <p>Tidak ada paket banjir tersedia saat ini</p>
+            </div>
+            @endforelse
         </div>
+        
+        <!-- Pagination -->
+        <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+    </div>
 
+    <!-- Add Ons Section untuk Paket Banjir -->
+    @if($addonsBanjir->count() > 0)
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8 mt-8 sm:mt-12">Add Ons Paket Banjir</h2>
+    
+    <div class="paket-container" data-section="addons-banjir" data-items-per-page="6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
+            @foreach($addonsBanjir as $addon)
+            <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-xl sm:text-2xl">✨</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $addon->nama }}</h3>
+                </div>
+                
+                <div class="border-t pt-3 sm:pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Harga Tambahan</p>
+                    <p class="text-xl sm:text-2xl font-bold text-red-500">Rp. {{ number_format($addon->harga, 0, ',', '.') }}</p>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+    </div>
+    @endif
+</div>
+
+<!-- Salon Mobil Section -->
+<div id="content-salon-mobil" class="tab-content hidden">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Salon Mobil</h2>
+    
+    <div class="paket-container mb-8" data-section="salon-mobil" data-items-per-page="6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
+            @forelse($pakets->filter(fn($p) => stripos($p->kategori_paket, 'salon') !== false) as $paket)
+            <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center gap-2 mb-3">
+                    @if($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'refresh'))
+                    <span class="text-xl sm:text-2xl">⭐</span>
+                    @elseif($paket->tingkatan && str_contains(strtolower($paket->tingkatan->Tingkatan), 'shine'))
+                    <span class="text-xl sm:text-2xl">⭐⭐</span>
+                    @else
+                    <span class="text-xl sm:text-2xl">⭐⭐⭐</span>
+                    @endif
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $paket->tingkatan ? $paket->tingkatan->Tingkatan : 'Salon' }}</h3>
+                </div>
+                
+                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{{ $paket->kategori_paket }}</p>
+                
+                @if($paket->tingkatan)
+                <div class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 space-y-1">
+                    {!! nl2br(e($paket->tingkatan->deskripsi)) !!}
+                </div>
+                @endif
+                
+                <div class="border-t pt-3 sm:pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Harga</p>
+                    <p class="text-xl sm:text-2xl font-bold text-red-500">
+                        {{ $paket->tingkatan ? 'Rp. ' . number_format($paket->tingkatan->harga, 0, ',', '.') : 'Hubungi Kami' }}
+                    </p>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <p>Tidak ada paket salon tersedia saat ini</p>
+            </div>
+            @endforelse
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+    </div>
+
+    <!-- Add Ons Section untuk Salon Mobil -->
+    @if($addonsSalon->count() > 0)
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8 mt-8 sm:mt-12">Add Ons Salon Mobil</h2>
+    
+    <div class="paket-container" data-section="addons-salon" data-items-per-page="6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 paket-grid">
+            @foreach($addonsSalon as $addon)
+            <div class="paket-item bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-xl sm:text-2xl">✨</span>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">{{ $addon->nama }}</h3>
+                </div>
+                
+                <div class="border-t pt-3 sm:pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Harga Tambahan</p>
+                    <p class="text-xl sm:text-2xl font-bold text-red-500">Rp. {{ number_format($addon->harga, 0, ',', '.') }}</p>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination flex flex-wrap justify-center items-center gap-2"></div>
+    </div>
+    @endif
+</div>
         <!-- Jenis Mobil Section -->
         <div id="content-jenis-mobil" class="tab-content hidden">
             <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 mb-6 sm:mb-8">Harga dari Jenis Mobil di CUCICAR</h2>

@@ -316,138 +316,130 @@
                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
     </div>
 </div>
-            <!-- Pilihan Penanganan -->
-            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Pilihan Penanganan</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Jenis Penanganan</label>
-                    <select name="id_Paket" id="id_Paket" required onchange="loadPaketPenanganan()"
-                            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                        <option value="">Pilih Jenis Penanganan</option>
-                        @foreach($pakets as $paket)
-                        <option value="{{ $paket->id_Paket }}">
-                            {{ $paket->kategori_paket }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Paket Penanganan</label>
-                    <select name="id_jenis_penanganan" id="id_jenis_penanganan" required onchange="calculateTotal()"
-                            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                        <option value="">Pilih paket dulu</option>
-                        @foreach($tingkatans as $tingkatan)
-                        <option value="{{ $tingkatan->id_Tingkatan }}" data-price="{{ $tingkatan->harga }}">
-                            {{ $tingkatan->Tingkatan }} - Rp {{ number_format($tingkatan->harga, 0, ',', '.') }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Addons Section -->
-            <div class="mb-6">
-                <label class="block text-gray-700 mb-2 font-semibold text-sm md:text-base">Tambahan Layanan (Addons)</label>
-                <select name="id_Addons" id="id_Addons" onchange="calculateTotal()"
-                        class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                    <option value="">-- Tidak Ada --</option>
-                    @foreach($addons as $addon)
-                    <option value="{{ $addon->id_addons }}" data-price="{{ $addon->harga }}">
-                        {{ $addon->nama }} (+Rp {{ number_format($addon->harga, 0, ',', '.') }})
-                    </option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <!-- Pengaturan Jadwal -->
-            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Pengaturan Jadwal</h4>
-            <div class="mb-6">
-                <label class="block text-gray-700 mb-2 text-sm md:text-base">Tanggal Pencucian</label>
-                <input type="datetime-local" name="tanggal" id="tanggal" required onchange="loadAvailablePegawai()"
-                       class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-            </div>
-            
-            <!-- Informasi Tambahan -->
-            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Informasi Tambahan</h4>
-            <div class="mb-6">
-                <label class="block text-gray-700 mb-2 text-sm md:text-base">Catatan Untuk Pegawai</label>
-                <textarea name="catatan" id="catatan"
-                          class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base"></textarea>
-            </div>
-            
-            <!-- Handle Admin -->
-            <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Handle (Admin)</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Pegawai</label>
-                    <select name="id_Pegawai" id="id_Pegawai" required
-                            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                        <option value="">Pilih tanggal dulu</option>
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1" id="pegawai-info"></p>
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-2 text-sm md:text-base">Admin</label>
-                    <input type="text" value="Anda" readonly
-                           class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 text-sm md:text-base">
-                </div>
-            </div>
+  <!-- Pilihan Penanganan -->
+<h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Pilihan Penanganan</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div>
+        <label class="block text-gray-700 mb-2 text-sm md:text-base">Jenis Penanganan</label>
+        <select name="id_Paket" id="id_Paket" required onchange="loadPaketPenanganan()"
+                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+            <option value="">Pilih Jenis Penanganan</option>
+            @foreach($pakets as $paket)
+            <option value="{{ $paket->id_Paket }}">
+                {{ $paket->kategori_paket }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    <div>
+        <label class="block text-gray-700 mb-2 text-sm md:text-base">Paket Penanganan</label>
+        <select name="id_jenis_penanganan" id="id_jenis_penanganan" required onchange="calculateTotal()"
+                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+            <option value="">Pilih jenis penanganan dulu</option>
+        </select>
+    </div>
+</div>
 
-            <!-- PAYMENT SECTION -->
-            <div class="border-t-2 pt-6 mt-6">
-                <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Informasi Pembayaran</h4>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Metode Pembayaran</label>
-                        <select name="metode" id="metode" required onchange="toggleDiskonField()"
-                                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                            <option value="">Pilih Metode</option>
-                            <option value="Tunai">Tunai</option>
-                            <option value="Non Tunai">Non Tunai</option>
-                        </select>
-                    </div>
-                    <div id="diskonField" style="display: none;">
-                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Diskon (Opsional)</label>
-                        <select name="id_Diskon" id="diskon" onchange="calculateTotal()"
-                                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                            <option value="">Tanpa Diskon</option>
-                            @foreach($diskons as $diskon)
-                            <option value="{{ $diskon->id_Diskon }}" data-persen="{{ $diskon->persen }}">
-                                {{ $diskon->nama }} - {{ $diskon->persen }}%
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+<!-- Addons Section -->
+<!-- Addons Section -->
+<div class="mb-6">
+    <label class="block text-gray-700 mb-2 font-semibold text-sm md:text-base">Tambahan Layanan (Addons)</label>
+    <select name="id_Addons" id="id_Addons" onchange="calculateTotal()"
+            class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+        <option value="">Pilih paket dulu</option>
+    </select>
+    <p class="text-xs text-gray-500 mt-1">Opsional - Pilih salah satu atau biarkan kosong</p>
+</div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4" id="jumlahUangField" style="display: none;">
-                    <div>
-                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Jumlah Uang</label>
-                        <input type="number" name="jumlah_uang" id="jumlah_uang" oninput="calculateKembalian()"
-                               class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 mb-2 text-sm md:text-base">Kembalian</label>
-                        <input type="number" name="kembalian" id="kembalian" readonly
-                               class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed text-green-600 font-bold text-sm md:text-base">
-                    </div>
-                </div>
+<!-- Pengaturan Jadwal -->
+<h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Pengaturan Jadwal</h4>
+<div class="mb-6">
+    <label class="block text-gray-700 mb-2 text-sm md:text-base">Tanggal Pencucian</label>
+    <input type="datetime-local" name="tanggal" id="tanggal" required onchange="loadAvailablePegawai()"
+           class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+</div>
 
-                <div class="mt-4 p-3 md:p-4 bg-teal-50 rounded-lg">
-                    <p class="text-base md:text-lg font-bold text-gray-700">Total Harga: <span id="totalHarga">Rp 0</span></p>
-                </div>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
-                <button type="button" onclick="closeModal('dataModal')" 
-                        class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
-                    Batal
-                </button>
-                <button type="submit" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base">
-                    Konfirmasi
-                </button>
-            </div>
+<!-- Informasi Tambahan -->
+<h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Informasi Tambahan</h4>
+<div class="mb-6">
+    <label class="block text-gray-700 mb-2 text-sm md:text-base">Catatan Untuk Pegawai</label>
+    <textarea name="catatan" id="catatan" rows="3"
+              class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base"></textarea>
+</div>
+
+<!-- Handle Admin -->
+<h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Handle (Admin)</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div>
+        <label class="block text-gray-700 mb-2 text-sm md:text-base">Pegawai</label>
+        <select name="id_Pegawai" id="id_Pegawai" required
+                class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+            <option value="">Pilih tanggal dulu</option>
+        </select>
+        <p class="text-xs text-gray-500 mt-1" id="pegawai-info"></p>
+    </div>
+    <div>
+        <label class="block text-gray-700 mb-2 text-sm md:text-base">Admin</label>
+        <input type="text" value="Anda" readonly
+               class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 text-sm md:text-base">
+    </div>
+</div>
+
+<!-- PAYMENT SECTION -->
+<div class="border-t-2 pt-6 mt-6">
+    <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-4">Informasi Pembayaran</h4>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-gray-700 mb-2 text-sm md:text-base">Metode Pembayaran</label>
+            <select name="metode" id="metode" required onchange="toggleDiskonField()"
+                    class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+                <option value="">Pilih Metode</option>
+                <option value="Tunai">Tunai</option>
+                <option value="Non Tunai">Non Tunai</option>
+            </select>
+        </div>
+        <div id="diskonField" style="display: none;">
+            <label class="block text-gray-700 mb-2 text-sm md:text-base">Diskon (Opsional)</label>
+            <select name="id_Diskon" id="diskon" onchange="calculateTotal()"
+                    class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+                <option value="">Tanpa Diskon</option>
+                @foreach($diskons as $diskon)
+                <option value="{{ $diskon->id_Diskon }}" data-persen="{{ $diskon->persen }}">
+                    {{ $diskon->nama }} - {{ $diskon->persen }}%
+                </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4" id="jumlahUangField" style="display: none;">
+        <div>
+            <label class="block text-gray-700 mb-2 text-sm md:text-base">Jumlah Uang</label>
+            <input type="number" name="jumlah_uang" id="jumlah_uang" oninput="calculateKembalian()"
+                   class="w-full px-3 md:px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm md:text-base">
+        </div>
+        <div>
+            <label class="block text-gray-700 mb-2 text-sm md:text-base">Kembalian</label>
+            <input type="number" name="kembalian" id="kembalian" readonly
+                   class="w-full px-3 md:px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed text-green-600 font-bold text-sm md:text-base">
+        </div>
+    </div>
+
+    <div class="mt-4 p-3 md:p-4 bg-teal-50 rounded-lg">
+        <p class="text-base md:text-lg font-bold text-gray-700">Total Harga: <span id="totalHarga">Rp 0</span></p>
+    </div>
+</div>
+
+<div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+    <button type="button" onclick="closeModal('dataModal')" 
+            class="bg-gray-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm md:text-base">
+        Batal
+    </button>
+    <button type="submit" class="bg-teal-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-teal-600 text-sm md:text-base">
+        Konfirmasi
+    </button>
+</div>
         </form>
     </div>
 </div>
@@ -774,8 +766,102 @@ function toggleDiskonField() {
     calculateTotal();
 }
 
+// ==================== LOAD TINGKATAN BY PAKET ====================
+// ==================== LOAD TINGKATAN & ADDONS BY PAKET ====================
 function loadPaketPenanganan() {
-    calculateTotal();
+    const paketId = document.getElementById('id_Paket').value;
+    const tingkatanSelect = document.getElementById('id_jenis_penanganan');
+    const addonsSelect = document.getElementById('id_Addons');
+    
+    // Reset selects
+    tingkatanSelect.innerHTML = '<option value="">Loading...</option>';
+    addonsSelect.innerHTML = '<option value="">Loading...</option>';
+    
+    if (!paketId) {
+        tingkatanSelect.innerHTML = '<option value="">Pilih jenis penanganan dulu</option>';
+        addonsSelect.innerHTML = '<option value="">Pilih paket dulu</option>';
+        calculateTotal();
+        return;
+    }
+    
+    console.log('=== LOAD DATA BY PAKET ===');
+    console.log('Paket ID:', paketId);
+    
+    // ========== LOAD TINGKATAN ==========
+    fetch('/api/tingkatan-by-paket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ id_paket: paketId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Tingkatan response:', data);
+        
+        if (data.success) {
+            tingkatanSelect.innerHTML = '<option value="">Pilih Paket Penanganan</option>';
+            
+            if (data.data.length === 0) {
+                tingkatanSelect.innerHTML = '<option value="">Tidak ada paket tersedia</option>';
+            } else {
+                data.data.forEach((tingkatan) => {
+                    const option = document.createElement('option');
+                    option.value = tingkatan.id_Tingkatan;
+                    option.textContent = `${tingkatan.Tingkatan} - Rp ${new Intl.NumberFormat('id-ID').format(tingkatan.harga)}`;
+                    option.dataset.price = tingkatan.harga;
+                    tingkatanSelect.appendChild(option);
+                });
+            }
+        } else {
+            tingkatanSelect.innerHTML = '<option value="">Error loading data</option>';
+            alert(data.message || 'Gagal memuat tingkatan');
+        }
+        calculateTotal();
+    })
+    .catch(error => {
+        console.error('Error loading tingkatan:', error);
+        tingkatanSelect.innerHTML = '<option value="">Error</option>';
+        alert('Terjadi kesalahan: ' + error.message);
+    });
+    
+    // ========== LOAD ADDONS BY PAKET ==========
+    fetch('/api/addons-by-paket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ id_paket: paketId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Addons response:', data);
+        
+        if (data.success) {
+            addonsSelect.innerHTML = '<option value="">-- Tidak Ada --</option>';
+            
+            if (data.data.length > 0) {
+                data.data.forEach((addon) => {
+                    const option = document.createElement('option');
+                    option.value = addon.id_addons;
+                    option.textContent = `${addon.nama} (+Rp ${new Intl.NumberFormat('id-ID').format(addon.harga)})`;
+                    option.dataset.price = addon.harga;
+                    addonsSelect.appendChild(option);
+                });
+            }
+        } else {
+            addonsSelect.innerHTML = '<option value="">-- Tidak Ada --</option>';
+        }
+        calculateTotal();
+    })
+    .catch(error => {
+        console.error('Error loading addons:', error);
+        addonsSelect.innerHTML = '<option value="">-- Tidak Ada --</option>';
+    });
 }
 
 function openCreateModal() {

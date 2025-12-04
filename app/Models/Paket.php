@@ -5,27 +5,38 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-// Model Paket
 class Paket extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'pakets';
     protected $primaryKey = 'id_Paket';
     public $timestamps = true;
-    
+
     protected $fillable = [
-        'kategori_paket',
-        'id_Tingkatan'
+        'kategori_paket'
     ];
-    
-    public function bookings()
+
+    // Relasi ke Tingkatan (One to Many)
+    public function tingkatans()
     {
-        return $this->hasMany(Booking::class, 'id_Paket', 'id_Paket');
+        return $this->hasMany(Tingkatan::class, 'id_paket', 'id_Paket');
     }
-    
+
+    // Relasi ke satu tingkatan (untuk display)
     public function tingkatan()
     {
-        return $this->belongsTo(Tingkatan::class, 'id_Tingkatan', 'id_Tingkatan');
+        return $this->hasOne(Tingkatan::class, 'id_paket', 'id_Paket');
+    }
+
+    // Relasi Many-to-Many dengan Addons
+    public function addons()
+    {
+        return $this->belongsToMany(
+            Addons::class,
+            'paket_addons',
+            'id_paket',
+            'id_addons'
+        );
     }
 }
